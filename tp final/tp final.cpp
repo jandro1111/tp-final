@@ -1,20 +1,23 @@
 // tp final.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <iostream>
+#include"Header.h"
+#include"blockchain.h"
+
+using namespace std;
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    int num =0;
+    string aux;
+    nlohmann::json bloque;
+    std::string file = "ejemplo.json";
+    blockchain prueba(file);
+    bloque=prueba.getblock(num);//pasar indice como si fuese un array
+    cout << "id del bloque: " << prueba.getblockid(bloque) << endl;
+    cout <<"id del bloque anterior: "<< prueba.getpreviousblockid(bloque) << endl;
+    cout <<"height: "<< prueba.getheight(bloque) << endl;
+    cout <<"merkleroot: "<< prueba.getmerkleroot(bloque) << endl;
+    cout<<"nonce: "<< prueba.getnonce(bloque) << endl;
+    cout<<"numero de transacciones: "<< prueba.getnTx(bloque) << endl;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
