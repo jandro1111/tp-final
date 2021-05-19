@@ -139,7 +139,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="blockchain generator.cpp" />
     <ClCompile Include="tp final.cpp" />
   </ItemGroup>
   <ItemGroup>
