@@ -81,4 +81,69 @@ int blockchain::getnonce(nlohmann::json block)
 {
     return block.at("nonce");
 }
+//  get tx
+nlohmann::json blockchain::gettx(nlohmann::json block,int cant)
+{
+    try {
+        return block.at("tx")[cant];
+    }
+    catch (...) {
+        return NULL;
+    }
+}
+//  get vin
+nlohmann::json blockchain::getvin(nlohmann::json tx,int cant)
+{
+    try {
+        return tx.at("vin")[cant];
+    }
+    catch (...) {
+        return NULL;
+    }
+}
+//  get vout
+nlohmann::json blockchain::getvout(nlohmann::json tx,int cant)
+{
+    try {
+        return tx.at("vout")[cant];
+    }
+    catch (...) {
+        return NULL;
+    }
+}
+//  get txid
+std::string blockchain::gettxid(nlohmann::json tx)
+{
+    return tx.at("txid");
+}
+//  get ntxin
+int blockchain::getnTxin(nlohmann::json tx)
+{
+    return tx.at("nTxin");
+}
+//  get ntxout
+int blockchain::getnTxout(nlohmann::json tx)
+{
+    return tx.at("nTxout");
+}
+//  get public id
+std::string blockchain::getpublicid(nlohmann::json vout)
+{
+    return vout.at("publicid");
+}
+//  get amount
+int blockchain::getamount(nlohmann::json vout)
+{
+    return  vout.at("amount");
+}
+//  get signature
+string blockchain::getsignature(nlohmann::json vin)
+{
+    return  vin.at("signature");
+}
+//  get outputindex
+int blockchain::getoutputIndex(nlohmann::json vin)
+{
+    return  vin.at("outputIndex");
+}
 // 

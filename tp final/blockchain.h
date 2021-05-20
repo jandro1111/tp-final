@@ -12,7 +12,17 @@ public:
 	std::string getpreviousblockid(nlohmann::json);//recibe el json de getblock devuelve el previousblockid
 	std::string getmerkleroot(nlohmann::json);//recibe el json de getblock devuelve el merkleroot
 	int getnonce(nlohmann::json);//recibe el json de getblock devuelve el nonce
-	//nlohmann::json gettx(nlohmann::json);
+	nlohmann::json gettx(nlohmann::json, int);//recibe el json de getblock devuelve el tx si existe, si no devuelve null
+	nlohmann::json getvin(nlohmann::json,int);//recibe el json de gettx devuelve el vin si existe, si no devuelve null
+	nlohmann::json getvout(nlohmann::json,int);//recibe el json de gettx devuelve el vout si existe, si no devuelve null
+	std::string gettxid(nlohmann::json);//recibe el json de gettx devuelve el txid
+	int getnTxin(nlohmann::json);//recibe el json de gettx devuelve el ntxvin
+	int getnTxout(nlohmann::json);//recibe el json de gettx devuelve el ntxvout
+	std::string getpublicid(nlohmann::json);//recibe el json de getvout devuelve el publicid
+	int getamount(nlohmann::json);//recibe el json de getvout devuelve el amount
+	std::string getsignature(nlohmann::json);//recibe el json de getvin devuelve el signature
+	int getoutputIndex(nlohmann::json);//recibe el json de getvin devuelve el outputindex
+
 private:
 	nlohmann::json j;// el blockchain
 };
