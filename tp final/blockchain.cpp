@@ -1,7 +1,7 @@
 #include "blockchain.h"
 using namespace std;
 //	generate id	//
-static unsigned int generateID(unsigned char* str)
+unsigned int generateID(const char* str)
 {
 	unsigned int ID = 0;
 	int c;
@@ -11,6 +11,20 @@ static unsigned int generateID(unsigned char* str)
 	}
 	return ID;
 }
+//  hexcoded ascii
+template< typename T >
+std::string int_to_hex(T i)
+{
+    std::stringstream stream;
+    stream << std::setfill('0') << std::setw(sizeof(T) * 2)
+        << std::hex << i;
+    return stream.str();
+}
+string int2hex(int num) {
+    return int_to_hex(num);
+}
+
+//
 //	operaciones del bloque	//
 //	constructor
 blockchain::blockchain(std::string file)
@@ -145,5 +159,19 @@ string blockchain::getsignature(nlohmann::json vin)
 int blockchain::getoutputIndex(nlohmann::json vin)
 {
     return  vin.at("outputIndex");
+}
+
+//  calcula el merkle root
+std::string blockchain::calculatemerkleroot(int num)
+{
+    string merkleroot="";
+    nlohmann::json bloque;
+    if (getblock(num) == NULL) {//ese bloque no existe
+        return merkleroot;
+    }
+    bloque = getblock(num);
+
+
+    return merkleroot;
 }
 // 

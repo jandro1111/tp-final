@@ -1,5 +1,7 @@
 #pragma once
 #include"Header.h"
+
+
 class blockchain
 {
 public:
@@ -22,8 +24,9 @@ public:
 	int getamount(nlohmann::json);//recibe el json de getvout devuelve el amount
 	std::string getsignature(nlohmann::json);//recibe el json de getvin devuelve el signature
 	int getoutputIndex(nlohmann::json);//recibe el json de getvin devuelve el outputindex
-
+	std::string calculatemerkleroot(int);//recibe el numero del bloque del cual va a querer calcular el merkleroot, devuelve null si es un numero de bloque no valido
 private:
 	nlohmann::json j;// el blockchain
 };
-
+unsigned int generateID(const char* str);
+std::string int2hex(int);
