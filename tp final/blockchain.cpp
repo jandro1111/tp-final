@@ -208,10 +208,13 @@ std::string blockchain::calculatemerkleroot(int num)
             aux += *it;
             aux = int2hex(generateID(aux.c_str()));
             cout << aux << endl;
+            //aca lo guardas en algun lado
             aux = "";
             par = false;
         }
-    }
+    }//repetir el for pero con los nodos ya calculados, idealmente hacer de este for una funcion o meterlo dentro de otro for
+    //antes de repetir verificar paridad
+    //meter datos en un tree
     aux = "7CD22096";
     aux += "24387EF4";
     aux = int2hex(generateID(aux.c_str()));
