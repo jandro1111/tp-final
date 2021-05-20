@@ -11,7 +11,7 @@ int main()
     int num,numoutofrange;
     num = 0;
     numoutofrange= 10;
-    string aux1,aux2,aux3,aux4;
+    string aux;
     char buffer[100] = { 0 };
     nlohmann::json bloque,tx,vin,vout;
     std::string file = "ejemplo.json";
@@ -38,7 +38,7 @@ int main()
     cout<<"signature: "<< prueba.getsignature(vin) << endl;
     cout << "en vout 1: " << endl;
     cout << "amount: " << prueba.getamount(vout) << endl;
-    cout<<"publicid: "<< prueba.getpublicid(vout) << endl;
-    
-    
+    cout<<"publicid: "<< prueba.getpublicid(vout) << endl<<endl;
+    prueba.calculatemerkleroot(num);
+
 }
