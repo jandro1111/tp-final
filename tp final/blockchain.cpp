@@ -12,16 +12,15 @@ unsigned int generateID(const char* str)
 	return ID;
 }
 //  hexcoded ascii
-template< typename T >
-std::string int_to_hex(T i)
-{
-    std::stringstream stream;
-    stream << std::setfill('0') << std::setw(sizeof(T) * 2)
-        << std::hex << i;
-    return stream.str();
+template <typename I> std::string n2hexstr(I w, size_t hex_len = sizeof(I) << 1) {
+    static const char* digits = "0123456789ABCDEF";
+    std::string rc(hex_len, '0');
+    for (size_t i = 0, j = (hex_len - 1) * 4; i < hex_len; ++i, j -= 4)
+        rc[i] = digits[(w >> j) & 0x0f];
+    return rc;
 }
 string int2hex(int num) {
-    return int_to_hex(num);
+    return n2hexstr(num,sizeof(num)*2);
 }
 
 //
@@ -198,7 +197,6 @@ std::string blockchain::calculatemerkleroot(int num)
         k++;
     }
     //
-    // hasta aca anda bien
     //
     bool par = false;
     for (std::list<string>::iterator it = hojas.begin(); it != hojas.end(); ++it) {
@@ -214,9 +212,10 @@ std::string blockchain::calculatemerkleroot(int num)
             par = false;
         }
     }
-
-
-
+    aux = "7CD22096";
+    aux += "24387EF4";
+    aux = int2hex(generateID(aux.c_str()));
+    cout << aux << endl;
     return merkleroot;
 }
 // 
