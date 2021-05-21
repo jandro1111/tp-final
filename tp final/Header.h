@@ -12,5 +12,5 @@
 #include<boost/format.hpp>
 #include<iomanip>
 //	DEFINES	//
-
+const nlohmann::json nulljson ;//supongamos que es un define
 //	STRUCT	//

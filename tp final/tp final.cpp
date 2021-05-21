@@ -12,7 +12,6 @@ int main()
     num = 0;
     numoutofrange= 10;
     string aux;
-    char buffer[100] = { 0 };
     nlohmann::json bloque,tx,vin,vout;
     std::string file = "ejemplo.json";
     blockchain prueba(file);
@@ -22,7 +21,8 @@ int main()
     vin = prueba.getvin(tx, num);//pasar num como indice
     vout = prueba.getvout(tx, num);//pasar num como indice
 
-    /*cout << "id del bloque: " << prueba.getblockid(bloque) << endl;
+    cout << "cantidad de bloques: "<<prueba.getcantblock() << endl;
+    cout << "id del bloque: " << prueba.getblockid(bloque) << endl;
     cout <<"id del bloque anterior: "<< prueba.getpreviousblockid(bloque) << endl;
     cout <<"height: "<< prueba.getheight(bloque) << endl;
     cout <<"merkleroot: "<< prueba.getmerkleroot(bloque) << endl;
@@ -38,8 +38,7 @@ int main()
     cout<<"signature: "<< prueba.getsignature(vin) << endl;
     cout << "en vout 1: " << endl;
     cout << "amount: " << prueba.getamount(vout) << endl;
-    cout<<"publicid: "<< prueba.getpublicid(vout) << endl<<endl;*/
-
+    cout<<"publicid: "<< prueba.getpublicid(vout) << endl<<endl;
     prueba.calculatemerkleroot(num);
 
 }

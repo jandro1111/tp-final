@@ -49,10 +49,23 @@ blockchain::blockchain(std::string file)
         //Muestro si hubo un error de la libreria
         cout<< e.what() <<endl<<"el json no se pudo parsear bien";
     }
+    calculatecantblocks();
 }
 //	destructor
 blockchain::~blockchain() {
 
+}
+//calculateblocks
+void blockchain::calculatecantblocks() {
+    int i = 0;
+    for (i; j[i] != nulljson; ++i) {
+
+    }
+    cantblocks = i;
+}
+//get cantblocks
+int blockchain::getcantblock() {
+    return cantblocks;
 }
 // get block
 nlohmann::json blockchain::getblock(int cant)
@@ -61,7 +74,7 @@ nlohmann::json blockchain::getblock(int cant)
         return j[cant];
     }
     catch (...) {
-        return NULL;
+        return nulljson;
     }
 }
 //  get blockid
@@ -101,7 +114,7 @@ nlohmann::json blockchain::gettx(nlohmann::json block,int cant)
         return block.at("tx")[cant];
     }
     catch (...) {
-        return NULL;
+        return  nulljson;
     }
 }
 //  get vin
@@ -111,7 +124,7 @@ nlohmann::json blockchain::getvin(nlohmann::json tx,int cant)
         return tx.at("vin")[cant];
     }
     catch (...) {
-        return NULL;
+        return nulljson;
     }
 }
 //  get vout
@@ -121,7 +134,7 @@ nlohmann::json blockchain::getvout(nlohmann::json tx,int cant)
         return tx.at("vout")[cant];
     }
     catch (...) {
-        return NULL;
+        return nulljson;
     }
 }
 //  get txid
@@ -159,7 +172,6 @@ int blockchain::getoutputIndex(nlohmann::json vin)
 {
     return  vin.at("outputIndex");
 }
-
 //  calcula el merkle root
 std::string blockchain::calculatemerkleroot(int num)
 {
@@ -169,7 +181,7 @@ std::string blockchain::calculatemerkleroot(int num)
     string merkleroot="";
     list<string> hojas;
     nlohmann::json bloque,tx,vin;
-    if (getblock(num) == NULL) {//ese bloque no existe
+    if (getblock(num) == nulljson) {//ese bloque no existe
         return merkleroot;
     }
     bloque = getblock(num);
@@ -215,8 +227,8 @@ std::string blockchain::calculatemerkleroot(int num)
     }//repetir el for pero con los nodos ya calculados, idealmente hacer de este for una funcion o meterlo dentro de otro for
     //antes de repetir verificar paridad
     //meter datos en un tree
-    aux = "7CD22096";
-    aux += "24387EF4";
+    aux = "7CD22096";//esto despues lo sacas
+    aux += "24387EF4";//esto despues lo sacas
     aux = int2hex(generateID(aux.c_str()));
     cout << aux << endl;
     return merkleroot;
