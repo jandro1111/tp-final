@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,23 +142,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="blockchain.cpp" />
-    <ClCompile Include="imgui.cpp" />
-    <ClCompile Include="imgui_demo.cpp" />
-    <ClCompile Include="imgui_draw.cpp" />
-    <ClCompile Include="imgui_tables.cpp" />
-    <ClCompile Include="imgui_widgets.cpp" />
+    <ClCompile Include="files.cpp" />
+    <ClCompile Include="Gui.cpp" />
+    <ClCompile Include="lib\imgui.cpp" />
+    <ClCompile Include="lib\imgui_demo.cpp" />
+    <ClCompile Include="lib\imgui_draw.cpp" />
+    <ClCompile Include="lib\imgui_impl_allegro5.cpp" />
+    <ClCompile Include="lib\imgui_tables.cpp" />
+    <ClCompile Include="lib\imgui_widgets.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="tp final.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="blockchain.h" />
+    <ClInclude Include="files.h" />
+    <ClInclude Include="Gui.h" />
     <ClInclude Include="Header.h" />
-    <ClInclude Include="imconfig.h" />
-    <ClInclude Include="imgui.h" />
-    <ClInclude Include="imgui_internal.h" />
-    <ClInclude Include="imstb_rectpack.h" />
-    <ClInclude Include="imstb_textedit.h" />
-    <ClInclude Include="imstb_truetype.h" />
     <ClInclude Include="json.hpp" />
+    <ClInclude Include="lib\imconfig.h" />
+    <ClInclude Include="lib\imgui.h" />
+    <ClInclude Include="lib\imgui_impl_allegro5.h" />
+    <ClInclude Include="lib\imgui_internal.h" />
+    <ClInclude Include="lib\imstb_rectpack.h" />
+    <ClInclude Include="lib\imstb_textedit.h" />
+    <ClInclude Include="lib\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ejemplo.json" />

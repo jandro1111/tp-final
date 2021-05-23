@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int main()
+int main2()
 {
     int num,numoutofrange;
     num = 0;
@@ -40,5 +40,5 @@ int main()
     cout << "amount: " << prueba.getamount(vout) << endl;
     cout<<"publicid: "<< prueba.getpublicid(vout) << endl<<endl;
     prueba.calculatemerkleroot(num);
-
+    return 0;
 }
