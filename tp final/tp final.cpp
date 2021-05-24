@@ -64,8 +64,20 @@ int main()
 	al_register_event_source(queue, al_get_keyboard_event_source());
 	al_register_event_source(queue, al_get_mouse_event_source());
 	al_register_event_source(queue, al_get_timer_event_source(timer));
-
+	ALLEGRO_FONT* font;
+	font = al_load_ttf_font(TREE_FONT, 40, 0);
+	if (font == NULL) {
+		fprintf(stderr, "failed to create font!\n");
+		return -1;
+	}
 	bool redraw = true;
+
+	//PRUEBA
+	vector <std::string> tree;
+	for (int i = 0; i < 15; i++) {
+		tree.push_back("1234");
+	}
+
 
 	al_start_timer(timer);
 	while (running) {
@@ -95,28 +107,33 @@ int main()
 						nlohmann::json block;
 						for (int i = 0; i < myBlockchain.getcantblock(); i++) {
 							block = myBlockchain.getblock(i);
-							myGui.setBlockInfo(myBlockchain.getblockid(block), myBlockchain.getpreviousblockid(block), 
-												myBlockchain.getnTx(block), myBlockchain.getheight(block), myBlockchain.getnonce(block));
+							if (block != nulljson) {
+								myGui.setBlockInfo(myBlockchain.getblockid(block), myBlockchain.getpreviousblockid(block),
+									myBlockchain.getnTx(block), myBlockchain.getheight(block), myBlockchain.getnonce(block));
+							}
 						}
 					}
 					if (myGui.getSelectedBlock() != NO_SELECTION) {
 						//myGui.setMerkleRoot();
-						//myGui.setMerkleTree();
+						myGui.setMerkleTree(tree);
 					}
 
 					// ---------- Rendering  ---------- //
 					ImGui::Render();
 
-					al_clear_to_color(al_map_rgba_f(1, 1, 0.8, 1));
-
+					//al_clear_to_color(al_map_rgba_f(1, 1, 0.8, 1));
+					al_clear_to_color(BLACK);
 					//Todo lo que dibuje aca va a quedar por detrás de las ventanas de DearImGui
+
 
 					ImGui_ImplAllegro5_RenderDrawData(ImGui::GetDrawData());
 
 					//Todo lo que dibuje aca va a quedar por encima de las ventanas de DearImGui
 
+					if (myGui.isMerkleTree()) {
+						myGui.drawMerkleTree();
+					}
 					myGui.update();
-					//redraw = false;
 				}
 				break;
 
@@ -139,8 +156,8 @@ int main()
 
 	//Destructores Allegro
 	myGui.destroyAllegro();
+	al_destroy_timer(timer);
 	al_destroy_event_queue(queue);
-	al_destroy_display(myGui.display);
 
-    return 0;
+	return 0;
 }

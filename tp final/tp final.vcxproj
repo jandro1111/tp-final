@@ -169,6 +169,12 @@
   <ItemGroup>
     <None Include="ejemplo.json" />
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="Fonts\courier.ttf" />
+    <Font Include="Fonts\love.ttf" />
+    <Font Include="Fonts\Minecraft.ttf" />
+    <Font Include="Fonts\OpenSans-Semibold.ttf" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

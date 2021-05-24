@@ -6,12 +6,14 @@ Gui::Gui() {
     closeWindow = false;
     display = NULL;
     buffer = NULL;
+    font = NULL;
     state = OPEN_FILE;
     doAction = NOTHING;
     selectedFile = 0;
     selectedBlock = 0;
     merkleRoot = "";
-    merkleTree = NULL;
+    merkleTree.clear();
+    newMerkleRoot = false;
 }
 
 bool Gui::initGUI()
@@ -27,7 +29,7 @@ bool Gui::initGUI()
         return false;
     }
 
-    al_set_window_title(this->display, "Display Selector");
+    al_set_window_title(this->display, "Bloc");
 
     configEvents();
 
@@ -107,63 +109,60 @@ void Gui::mainWindow()
 
             if (blockInfo.size() != 0) {
 
-                ImGui::TextColored(ImVec4(1, 1, 0, 1), "Merkle root"); ImGui::SameLine();
-                if (ImGui::Button("Calculate")) {
+                //ImGui::TextColored(ImVec4(1, 1, 0, 1), "Merkle root"); ImGui::SameLine();
+                if (ImGui::Button("Merkle Root")) {
                     doAction = CALC_MERKLE;
-                }
-                ImGui::SameLine();
-                if (ImGui::Button("Validate")) {
-                    doAction = VALIDATE_MERKLE;
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("Merkle Tree")) {
                     doAction = SHOW_TREE;
                 }
-                if (doAction == CALC_MERKLE || doAction == VALIDATE_MERKLE || doAction == SHOW_TREE) {
+                if (doAction == CALC_MERKLE || doAction == SHOW_TREE) {
                     ImGui::SameLine();
                     if (ImGui::Button("Close")) {
                         doAction = NOTHING;
                         merkleRoot = "";
+                        merkleTree.clear();
                     }
                     if (doAction == CALC_MERKLE && merkleRoot != "") {
-                        ImGui::TextColored(ImVec4(1, 1, 0, 1), ("Block " + std::to_string(selectedBlock) + " merkle root: ").c_str()); ImGui::SameLine();
-                        ImGui::Text(merkleRoot.c_str());
-                    }
-                    if (doAction == VALIDATE_MERKLE && merkleRoot != "") {
-                        //ImGui::TextColored(ImVec4(1, 1, 0, 1), ("Block " + std::to_string(selectedBlock) + " merkle root: ").c_str()); ImGui::SameLine();
-                        //ImGui::Text(merkleRoot.c_str());
+                        ImGui::TextColored(ImVec4(1, 1, 0, 1), ("Block " + std::to_string(selectedBlock) + ":").c_str());
+                        ImGui::Indent();
+                        ImGui::Text(("Calulated: " + merkleRoot).c_str());
+                        ImGui::Text(("Block's: " + merkleRoot).c_str());
                     }
                 }
                 ImGui::Separator();
                 //ImGui::Spacing();
 
-                ImGui::BeginChild("Scrolling");
+                if (doAction != SHOW_TREE) {
+                    ImGui::BeginChild("Scrolling");
 
-                //Bloques
-                for (int i = 0; i != blockInfo.size(); i++) {
-                    //if (ImGui::TreeNode(("Block " + std::to_string(i)).c_str())) {
-                    //    ImGui::Indent(); 
-                    //    ImGui::Text(("Block ID: " + blockInfo[i].blockID).c_str());
-                    //    ImGui::Text(("Previous block ID: " + blockInfo[i].previousBlockID).c_str());
-                    //    ImGui::Text(("#Transactions: " + std::to_string(blockInfo[i].cantTransactions)).c_str());
-                    //    ImGui::Text(("Block number: " + std::to_string(blockInfo[i].blockNumber)).c_str());
-                    //    ImGui::Text(("Nonce: " + std::to_string(blockInfo[i].nonce)).c_str());
-                    //    ImGui::Unindent(); 
-                    //    ImGui::TreePop();
-                    //}
+                    //Bloques
+                    for (int i = 0; i != blockInfo.size(); i++) {
+                        //if (ImGui::TreeNode(("Block " + std::to_string(i)).c_str())) {
+                        //    ImGui::Indent(); 
+                        //    ImGui::Text(("Block ID: " + blockInfo[i].blockID).c_str());
+                        //    ImGui::Text(("Previous block ID: " + blockInfo[i].previousBlockID).c_str());
+                        //    ImGui::Text(("#Transactions: " + std::to_string(blockInfo[i].cantTransactions)).c_str());
+                        //    ImGui::Text(("Block number: " + std::to_string(blockInfo[i].blockNumber)).c_str());
+                        //    ImGui::Text(("Nonce: " + std::to_string(blockInfo[i].nonce)).c_str());
+                        //    ImGui::Unindent(); 
+                        //    ImGui::TreePop();
+                        //}
 
-                    ImGui::RadioButton(("Block " + std::to_string(i)).c_str(), &selectedBlock, i);
-                    if (selectedBlock == i) {
-                        ImGui::Indent(); ImGui::Indent();
-                        ImGui::Text(("Block ID: " + blockInfo[i].blockID).c_str());
-                        ImGui::Text(("Previous block ID: " + blockInfo[i].previousBlockID).c_str());
-                        ImGui::Text(("#Transactions: " + std::to_string(blockInfo[i].cantTransactions)).c_str());
-                        ImGui::Text(("Block number: " + std::to_string(blockInfo[i].blockNumber)).c_str());
-                        ImGui::Text(("Nonce: " + std::to_string(blockInfo[i].nonce)).c_str());
-                        ImGui::Unindent(); ImGui::Unindent();
+                        ImGui::RadioButton(("Block " + std::to_string(i)).c_str(), &selectedBlock, i);
+                        if (selectedBlock == i) {
+                            ImGui::Indent(); ImGui::Indent();
+                            ImGui::Text(("Block ID: " + blockInfo[i].blockID).c_str());
+                            ImGui::Text(("Previous block ID: " + blockInfo[i].previousBlockID).c_str());
+                            ImGui::Text(("#Transactions: " + std::to_string(blockInfo[i].cantTransactions)).c_str());
+                            ImGui::Text(("Block number: " + std::to_string(blockInfo[i].blockNumber)).c_str());
+                            ImGui::Text(("Nonce: " + std::to_string(blockInfo[i].nonce)).c_str());
+                            ImGui::Unindent(); ImGui::Unindent();
+                        }
                     }
+                    ImGui::EndChild();
                 }
-                ImGui::EndChild();
             }
             else {
                 ImGui::Text("No blocks in selected file");
@@ -227,7 +226,7 @@ void Gui::mainWindow()
             if (ImGui::Button("Select"))
             {
                 //Se eligio archivo
-                if (selectedFile >= (int) dirs.size()) {
+                if (selectedFile >= (int)dirs.size()) {
                     currentPath = files[selectedFile - dirs.size()];
                     selectedPath = files[selectedFile - dirs.size()];
                     state = MAIN_WINDOW;
@@ -293,58 +292,105 @@ void Gui::mainWindow()
             }
 
             //for (std::filesystem::recursive_directory_iterator it(parentDir);
-            //    it != std::filesystem::recursive_directory_iterator();
-            //    ++it) {
-            //    index++;
-            //    if (std::filesystem::is_directory(it->path())) {
-            //        for (int i = 0; i < it.depth(); ++i) {
-            //            ImGui::Indent();
-            //        }
-            //        ImGui::BulletText(it->path().filename().string().c_str());
-            //        for (int i = 0; i < it.depth(); ++i) {
-            //            ImGui::Unindent();
-            //        }
-            //    }
-            //    else {
-            //        files.push_back(*it);
-            //        for (int i = 0; i < it.depth(); ++i) {
-            //            ImGui::Indent();
-            //        }
-            //        ImGui::RadioButton(it->path().filename().string().c_str(), &selectedPath, index);
-            //        for (int i = 0; i < it.depth(); ++i) {
-            //            ImGui::Unindent();
-            //        }
-            //    }
-            //}
+            //it != std::filesystem::recursive_directory_iterator();
+            //++it) {
+        //    index++;
+        //    if (std::filesystem::is_directory(it->path())) {
+        //        for (int i = 0; i < it.depth(); ++i) {
+        //            ImGui::Indent();
+        //        }
+        //        ImGui::BulletText(it->path().filename().string().c_str());
+        //        for (int i = 0; i < it.depth(); ++i) {
+        //            ImGui::Unindent();
+        //        }
+        //    }
+        //    else {
+        //        files.push_back(*it);
+        //        for (int i = 0; i < it.depth(); ++i) {
+        //            ImGui::Indent();
+        //        }
+        //        ImGui::RadioButton(it->path().filename().string().c_str(), &selectedPath, index);
+        //        for (int i = 0; i < it.depth(); ++i) {
+        //            ImGui::Unindent();
+        //        }
+        //    }
+        //}
 
-            //for (std::filesystem::recursive_directory_iterator it(strPath);
-            //    it != std::filesystem::recursive_directory_iterator();
-            //    ++it) {
-            //    if (std::filesystem::is_directory(it->path())) {
-            //        for (int i = 0; i < it.depth(); ++i) {
-            //            ImGui::Indent();
-            //        }
-            //        if (ImGui::TreeNode(it->path().filename().string().c_str())) {
-            //        }
-            //        for (int i = 0; i < it.depth(); ++i) {
-            //            ImGui::Unindent();
-            //        }
-            //    }
-            //    else {
-            //        for (int i = 0; i < it.depth(); ++i) {
-            //            ImGui::Indent();
-            //        }
-            //        ImGui::Text(it->path().filename().string().c_str());
-            //        for (int i = 0; i < it.depth(); ++i) {
-            //            ImGui::Unindent();
-            //        }
-            //    }
-            //}
+        //for (std::filesystem::recursive_directory_iterator it(strPath);
+        //    it != std::filesystem::recursive_directory_iterator();
+        //    ++it) {
+        //    if (std::filesystem::is_directory(it->path())) {
+        //        for (int i = 0; i < it.depth(); ++i) {
+        //            ImGui::Indent();
+        //        }
+        //        if (ImGui::TreeNode(it->path().filename().string().c_str())) {
+        //        }
+        //        for (int i = 0; i < it.depth(); ++i) {
+        //            ImGui::Unindent();
+        //        }
+        //    }
+        //    else {
+        //        for (int i = 0; i < it.depth(); ++i) {
+        //            ImGui::Indent();
+        //        }
+        //        ImGui::Text(it->path().filename().string().c_str());
+        //        for (int i = 0; i < it.depth(); ++i) {
+        //            ImGui::Unindent();
+        //        }
+        //    }
+        //}
             ImGui::EndChild();
         }
         ImGui::End();
         break;
-    }  
+    }
+}
+
+void Gui::drawMerkleTree(void) {
+    al_set_target_bitmap(buffer);
+    al_clear_to_color(BLACK);
+    static int treeHeight = 0;
+    static int treeNodes = 1;
+    static int sizeY = (int)(BUFFER_SIZE_Y / (treeHeight + 1));;
+    static int fontSize = 0;
+    if (newMerkleRoot) {
+        while (treeNodes < (int)merkleTree.size()) {
+            treeNodes *= 2;
+            treeHeight++;
+        }
+        std::cout << treeHeight << std::endl;
+        std::cout << treeNodes << std::endl;
+        sizeY = (int)(BUFFER_SIZE_Y / (treeHeight + 1));
+        fontSize = (int)(BUFFER_SIZE_Y / (treeHeight * 6));
+        newMerkleRoot = false;
+    }
+    font = al_load_ttf_font(TREE_FONT, fontSize, 0);
+    if (font == NULL) {
+        fprintf(stderr, "failed to create font!\n");
+        return;
+    }
+    //El primer for itera por los niveles del arbol
+    int node = 0;
+    int exp = 0;
+    for (int i = 1; i != treeNodes; i *= 2, exp++) {
+        int sizeX = (int)(BUFFER_SIZE_X / (i + 1));
+        for (int j = 0; j < i; j++) {
+            if (node != merkleTree.size()) {
+                al_draw_text(font, WHITE, sizeX * (j + 1), sizeY * (exp), ALLEGRO_ALIGN_CENTRE, merkleTree[node].c_str());
+                //if (i > 1) {
+                //    //En el caso de ser par
+                //    if((j % 2) == 0)
+                //        al_draw_line(sizeX * (j+1), sizeY * (exp), sizeX * (j+2), sizeY * (exp - 1), WHITE, (float)(12.0/ treeHeight));
+                //    else
+                //        al_draw_line(sizeX * (j+1), sizeY * (exp), sizeX * (j), sizeY * (exp - 1), WHITE, (float)(12.0 / treeHeight));
+                //}
+                node++;
+            }
+        }
+    }
+
+    al_set_target_backbuffer(display);
+    al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_SIZE_X, BUFFER_SIZE_Y, 5, DISPLAY_SIZE_Y - BUFFER_SIZE_Y, BUFFER_SIZE_X, DISPLAY_SIZE_Y, 0);
 }
 
 std::string Gui::getSelectedFile(void) {
@@ -353,7 +399,7 @@ std::string Gui::getSelectedFile(void) {
 }
 
 void Gui::setBlockInfo(std::string blockID, std::string previousBlockID, int cantTransactions, int blockNumber, int nonce) {
-    BlockInfo block = {blockID, previousBlockID, cantTransactions, blockNumber, nonce};
+    BlockInfo block = { blockID, previousBlockID, cantTransactions, blockNumber, nonce };
     blockInfo.push_back(block);
 }
 
@@ -362,7 +408,7 @@ bool Gui::isNewPath() {
 }
 
 int Gui::getSelectedBlock() {
-    if (doAction == CALC_MERKLE && merkleRoot == "") {
+    if ((doAction == CALC_MERKLE && merkleRoot == "") || (doAction == SHOW_TREE && merkleTree.size() == 0)) {
         return selectedBlock;
     }
     return NO_SELECTION;
@@ -372,13 +418,17 @@ void Gui::setMerkleRoot(std::string merkleRoot) {
     this->merkleRoot = merkleRoot;
 }
 
-void Gui::setMerkleTree(std::string * merkle) {
+void Gui::setMerkleTree(std::vector <std::string> merkle) {
     merkleTree = merkle;
+    newMerkleRoot = true;
+}
+
+bool Gui::isMerkleTree() {
+    return (doAction == SHOW_TREE);
 }
 
 bool Gui::configEvents()
 {
-
     return true;
 }
 
@@ -422,12 +472,22 @@ bool Gui::initAllegro(void)
         fprintf(stderr, "Failed to initialize ttf addon!\n");
         return false;
     }
+    buffer = al_create_bitmap(BUFFER_SIZE_X, BUFFER_SIZE_Y);
+    if (buffer == NULL)
+    {
+        fprintf(stderr, "Failed to initialize bitmap buffer!\n");
+        return false;
+    }
     return true;
 }
 
 
 void Gui::destroyAllegro(void)
 {
+    al_destroy_font(font);
+    al_destroy_bitmap(buffer);
+    al_destroy_display(display);
+
     al_shutdown_ttf_addon();
     al_shutdown_font_addon();
     al_shutdown_primitives_addon();
@@ -436,12 +496,5 @@ void Gui::destroyAllegro(void)
 
 void Gui::update(void)
 {
-
-    //al_set_target_bitmap(buffer);
-
-    //do stuff
-
-    //al_set_target_backbuffer(display);
-    //al_draw_scaled_bitmap(buffer, 0, 0, DISPLAY_SIZE_X, DISPLAY_SIZE_Y, 0, 0, DISPLAY_SIZE_X, DISPLAY_SIZE_Y, 0);
     al_flip_display();
 }
