@@ -150,7 +150,6 @@
     <ClCompile Include="lib\imgui_impl_allegro5.cpp" />
     <ClCompile Include="lib\imgui_tables.cpp" />
     <ClCompile Include="lib\imgui_widgets.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="tp final.cpp" />
   </ItemGroup>
   <ItemGroup>

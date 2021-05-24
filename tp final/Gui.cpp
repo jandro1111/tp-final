@@ -6,14 +6,17 @@ Gui::Gui() {
     closeWindow = false;
     display = NULL;
     buffer = NULL;
-    state = MAIN_WINDOW;
+    state = OPEN_FILE;
+    doAction = NOTHING;
     selectedFile = 0;
+    selectedBlock = 0;
+    merkleRoot = "";
+    merkleTree = NULL;
 }
 
 bool Gui::initGUI()
 {
-    if (!initAllegro())
-    {
+    if (!initAllegro()) {
         return false;
     }
 
@@ -70,8 +73,6 @@ void Gui::mainWindow()
     const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
 
     static bool windowActive = true;
-    static bool isOpen = false;
-    static bool searchFiles = false;
 
 
     switch (this->state) {
@@ -83,7 +84,7 @@ void Gui::mainWindow()
             if (ImGui::BeginMenu("Main"))
             {
                 state = MAIN_WINDOW;
-                searchFiles = false;
+                doAction = NOTHING;
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("File"))
@@ -94,8 +95,80 @@ void Gui::mainWindow()
             ImGui::EndMenuBar();
         }
 
-        ImGui::Text(("Selected file: " + currentPath.string()).c_str());
+        if (selectedPath.string() != "") {
 
+            //blockchain myBlockchain(selectedPath.string());
+            //nlohmann::json block;
+
+            ImGui::TextColored(ImVec4(1, 1, 0, 1), "Selected file: "); ImGui::SameLine();
+            ImGui::Text(selectedPath.string().c_str());
+
+            ImGui::Separator();
+
+            if (blockInfo.size() != 0) {
+
+                ImGui::TextColored(ImVec4(1, 1, 0, 1), "Merkle root"); ImGui::SameLine();
+                if (ImGui::Button("Calculate")) {
+                    doAction = CALC_MERKLE;
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Validate")) {
+                    doAction = VALIDATE_MERKLE;
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Merkle Tree")) {
+                    doAction = SHOW_TREE;
+                }
+                if (doAction == CALC_MERKLE || doAction == VALIDATE_MERKLE || doAction == SHOW_TREE) {
+                    ImGui::SameLine();
+                    if (ImGui::Button("Close")) {
+                        doAction = NOTHING;
+                        merkleRoot = "";
+                    }
+                    if (doAction == CALC_MERKLE && merkleRoot != "") {
+                        ImGui::TextColored(ImVec4(1, 1, 0, 1), ("Block " + std::to_string(selectedBlock) + " merkle root: ").c_str()); ImGui::SameLine();
+                        ImGui::Text(merkleRoot.c_str());
+                    }
+                    if (doAction == VALIDATE_MERKLE && merkleRoot != "") {
+                        //ImGui::TextColored(ImVec4(1, 1, 0, 1), ("Block " + std::to_string(selectedBlock) + " merkle root: ").c_str()); ImGui::SameLine();
+                        //ImGui::Text(merkleRoot.c_str());
+                    }
+                }
+                ImGui::Separator();
+                //ImGui::Spacing();
+
+                ImGui::BeginChild("Scrolling");
+
+                //Bloques
+                for (int i = 0; i != blockInfo.size(); i++) {
+                    //if (ImGui::TreeNode(("Block " + std::to_string(i)).c_str())) {
+                    //    ImGui::Indent(); 
+                    //    ImGui::Text(("Block ID: " + blockInfo[i].blockID).c_str());
+                    //    ImGui::Text(("Previous block ID: " + blockInfo[i].previousBlockID).c_str());
+                    //    ImGui::Text(("#Transactions: " + std::to_string(blockInfo[i].cantTransactions)).c_str());
+                    //    ImGui::Text(("Block number: " + std::to_string(blockInfo[i].blockNumber)).c_str());
+                    //    ImGui::Text(("Nonce: " + std::to_string(blockInfo[i].nonce)).c_str());
+                    //    ImGui::Unindent(); 
+                    //    ImGui::TreePop();
+                    //}
+
+                    ImGui::RadioButton(("Block " + std::to_string(i)).c_str(), &selectedBlock, i);
+                    if (selectedBlock == i) {
+                        ImGui::Indent(); ImGui::Indent();
+                        ImGui::Text(("Block ID: " + blockInfo[i].blockID).c_str());
+                        ImGui::Text(("Previous block ID: " + blockInfo[i].previousBlockID).c_str());
+                        ImGui::Text(("#Transactions: " + std::to_string(blockInfo[i].cantTransactions)).c_str());
+                        ImGui::Text(("Block number: " + std::to_string(blockInfo[i].blockNumber)).c_str());
+                        ImGui::Text(("Nonce: " + std::to_string(blockInfo[i].nonce)).c_str());
+                        ImGui::Unindent(); ImGui::Unindent();
+                    }
+                }
+                ImGui::EndChild();
+            }
+            else {
+                ImGui::Text("No blocks in selected file");
+            }
+        }
         ImGui::End();
         break;
 
@@ -108,7 +181,7 @@ void Gui::mainWindow()
             if (ImGui::BeginMenu("Main"))
             {
                 state = MAIN_WINDOW;
-                searchFiles = false;
+                doAction = NOTHING;
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("File"))
@@ -123,16 +196,17 @@ void Gui::mainWindow()
         ImGui::SameLine();
         if (ImGui::Button("Open"))
         {
+            selectedPath.clear();
+            currentPath.clear();
             std::string currentPathStr = "";
             currentPathStr += std::string(pathName);
-            //std::cout << currentPathStr << std::endl;
             currentPath = currentPathStr;
             path.setPath(currentPathStr);
             if (!path.openDirectory()) {
                 std::cout << "Failed when opening the directory!" << std::endl;
             }
             else {
-                searchFiles = true;
+                doAction = SEARCH_FILES;
                 files.clear();
                 files = path.getFiles();
                 dirs.clear();
@@ -143,11 +217,11 @@ void Gui::mainWindow()
         ImGui::SameLine();
         if (ImGui::Button("Close")) {
             state = MAIN_WINDOW;
-            searchFiles = false;
+            doAction = NOTHING;
         }
         ImGui::Separator();
 
-        if (searchFiles) {
+        if (doAction == SEARCH_FILES) {
 
             //Seleccion del archivo JSON
             if (ImGui::Button("Select"))
@@ -155,8 +229,10 @@ void Gui::mainWindow()
                 //Se eligio archivo
                 if (selectedFile >= (int) dirs.size()) {
                     currentPath = files[selectedFile - dirs.size()];
+                    selectedPath = files[selectedFile - dirs.size()];
                     state = MAIN_WINDOW;
-                    searchFiles = false;
+                    doAction = NOTIFY_NEW_PATH;
+                    selectedBlock = 0;
                 }
                 //Se ingresa en directorio
                 else {
@@ -268,10 +344,36 @@ void Gui::mainWindow()
         }
         ImGui::End();
         break;
+    }  
+}
+
+std::string Gui::getSelectedFile(void) {
+    blockInfo.clear();  //Limpia vector con info de los bloques del json
+    return selectedPath.string();
+}
+
+void Gui::setBlockInfo(std::string blockID, std::string previousBlockID, int cantTransactions, int blockNumber, int nonce) {
+    BlockInfo block = {blockID, previousBlockID, cantTransactions, blockNumber, nonce};
+    blockInfo.push_back(block);
+}
+
+bool Gui::isNewPath() {
+    return (doAction == NOTIFY_NEW_PATH);
+}
+
+int Gui::getSelectedBlock() {
+    if (doAction == CALC_MERKLE && merkleRoot == "") {
+        return selectedBlock;
     }
+    return NO_SELECTION;
+}
 
+void Gui::setMerkleRoot(std::string merkleRoot) {
+    this->merkleRoot = merkleRoot;
+}
 
-    
+void Gui::setMerkleTree(std::string * merkle) {
+    merkleTree = merkle;
 }
 
 bool Gui::configEvents()

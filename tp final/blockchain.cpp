@@ -36,7 +36,7 @@ blockchain::blockchain(std::string file)
             aux += linea;
         }
         doc.close();//termine de leer
-        cout << "lo pude abrir" << endl;
+        //cout << "lo pude abrir" << endl;
     }
     else {
         cout << "el archivo no existe" << endl;
