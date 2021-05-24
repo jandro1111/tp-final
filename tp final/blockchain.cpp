@@ -208,9 +208,14 @@ std::string blockchain::calculatemerkleroot(int num)
         cout << "hoja"<<k<<": "<<n.substr()<<endl;
         k++;
     }
-    //
+    // hasta aca calcula las hojas
     //
     bool par = false;
+    int index = 0;//4,6,7
+
+    vector<string> temp;
+    vector<string> fullMerkleTree; //Contiene todo el merkle tree, empezando por hojas y terminando por el root
+
     for (std::list<string>::iterator it = hojas.begin(); it != hojas.end(); ++it) {
         if (par == false) {//si me falta concatenar un elemento
             aux += *it;
@@ -219,18 +224,148 @@ std::string blockchain::calculatemerkleroot(int num)
         else {
             aux += *it;
             aux = int2hex(generateID(aux.c_str()));
+            temp.push_back(aux); // Cargo todos los id a una lista "temp"
+            fullMerkleTree.push_back(aux);
             cout << aux << endl;
+            index++;
             //aca lo guardas en algun lado
             aux = "";
             par = false;
         }
-    }//repetir el for pero con los nodos ya calculados, idealmente hacer de este for una funcion o meterlo dentro de otro for
+    }
+    while(temp.size() > 1){   
+        string newID;
+        unsigned int i = 0;
+        for (std::vector<string>::iterator it = temp.begin(); it != temp.end(); it++, i++) {
+            if(((i + 1) = temp.end()) && (temp.size() % 2 == 1)){ // si es impar y estoy en el ultimo lugar, agrego uno igual al final
+                temp.push_back(temp[i]);
+            }
+            newID = temp[i];
+            temp.erase(i);
+            newID += temp[i];
+            temp.erase(i);
+            newID = generateID(NewID.c_str());
+            temp.insert(i, newID);
+            fullMerkleTree.push_back(NewID);
+        }
+    }
+
+    for (int i = 0; i < index; ++i) {//creo un lista con las hojas
+        if (((index % 2) != 0) && (i == index - 1)) {//si estoy en la ultima hoja, y esta es impar, la vuelvo a agregar a la lista
+            hojas.push_back(aux);
+        }
+    }
+    //repetir el for pero con los nodos ya calculados, idealmente hacer de este for una funcion o meterlo dentro de otro for
     //antes de repetir verificar paridad
     //meter datos en un tree
-    aux = "7CD22096";//esto despues lo sacas
-    aux += "24387EF4";//esto despues lo sacas
-    aux = int2hex(generateID(aux.c_str()));
-    cout << aux << endl;
+
+    /*
+    
+    */
+
+
     return merkleroot;
 }
-// 
+//  SETTERS
+// set block id
+void blockchain::setblockid(int num, string id) {
+    if (num < 0 || num == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        j[num].at("blockid") = id;
+    }
+}
+//  set height
+void blockchain::setheight(int num, std::string height) {
+    if (num < 0 || num == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        j[num].at("height") = height;
+    }
+}
+// set merkleroot
+void blockchain::setmerkleroot(int num, std::string mk) {
+    if (num < 0 || num == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        j[num].at("merkleroot") = mk;
+    }
+}
+//  set nTx
+void blockchain::setnTx(int num, int nTx) {
+    if (num < 0 || num == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        j[num].at("nTx") = nTx;
+    }
+}
+//  set nonce
+void blockchain::setnonce(int num, int nonce) {
+    if (num < 0 || num == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        j[num].at("nonce") = nonce;
+    }
+}
+//  set previousblockid
+void blockchain::setpreviousblockid(int num, std::string pvid) {
+    if (num < 0 || num == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        j[num].at("previousblockid") = pvid;
+    }
+}
+//  set ntxin
+void blockchain::setnTxin(int block, int tx, int in) {
+    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        nlohmann::json bloque = getblock(block);
+        int nTx = getnTx(bloque);
+        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+            return;
+        }
+        else {
+            j[block].at("tx")[tx].at("nTxin") = in;
+        }
+    }
+}
+//  set ntxout
+void blockchain::setnTxout(int block, int tx, int out) {
+    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        nlohmann::json bloque = getblock(block);
+        int nTx = getnTx(bloque);
+        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+            return;
+        }
+        else {
+            j[block].at("tx")[tx].at("nTxout") = out;
+        }
+    }
+}
+//  set txid
+void blockchain::settxid(int block, int tx, string id) {
+    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        nlohmann::json bloque = getblock(block);
+        int nTx = getnTx(bloque);
+        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+            return;
+        }
+        else {
+            j[block].at("tx")[tx].at("txid") = id;
+        }
+    }
+}
