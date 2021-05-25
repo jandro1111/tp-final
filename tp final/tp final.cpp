@@ -42,7 +42,7 @@ int main()
 	cout << "en vout 1: " << endl;
 	cout << "amount: " << prueba.getamount(vout) << endl;
 	cout << "publicid: " << prueba.getpublicid(vout) << endl << endl;
-	prueba.calculatemerkleroot(num);
+	//prueba.calculatemerkleroot(num);
 
 
 	bool running = true;
@@ -64,17 +64,10 @@ int main()
 	al_register_event_source(queue, al_get_keyboard_event_source());
 	al_register_event_source(queue, al_get_mouse_event_source());
 	al_register_event_source(queue, al_get_timer_event_source(timer));
-	ALLEGRO_FONT* font;
-	font = al_load_ttf_font(TREE_FONT, 40, 0);
-	if (font == NULL) {
-		fprintf(stderr, "failed to create font!\n");
-		return -1;
-	}
-	bool redraw = true;
 
 	//PRUEBA
 	vector <std::string> tree;
-	for (int i = 0; i < 15; i++) {
+	for (int i = 0; i < 12; i++) {
 		tree.push_back("1234");
 	}
 
@@ -142,9 +135,9 @@ int main()
 				break;
 
 			case ALLEGRO_EVENT_DISPLAY_RESIZE:
-				//ImGui_ImplAllegro5_InvalidateDeviceObjects();
-				//al_acknowledge_resize(myGui.display);
-				//ImGui_ImplAllegro5_CreateDeviceObjects();
+				ImGui_ImplAllegro5_InvalidateDeviceObjects();
+				al_acknowledge_resize(myGui.display);
+				ImGui_ImplAllegro5_CreateDeviceObjects();
 				break;
 			}
 		}

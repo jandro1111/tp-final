@@ -16,20 +16,17 @@
 #include <allegro5/allegro_ttf.h>
 
 
+
+// --------------------------     ALLEGRO      -------------------------- //
+
 #define     DISPLAY_SIZE_X      720
 #define     DISPLAY_SIZE_Y      380
 #define     BUFFER_SIZE_X       710
-#define     BUFFER_SIZE_Y       280
+#define     BUFFER_SIZE_Y       280 
 
-#define     TREE_NODE_SIZE_X    
+#define     FPS                 12
 
-#define     FPS                 10
-
-#define     TREE_FONT           "./Fonts/Minecraft.ttf"
-
-
-#define     NO_SELECTION        -1
-
+#define     TREE_FONT           "./Fonts/Roboto-Light.ttf"
 
 // --------------------------     colores      -------------------------- //
 #define BLACK           al_map_rgb(14,14,14)
@@ -38,11 +35,17 @@
 #define GREEN           al_map_rgb(0,155,0)
 #define GREY            al_map_rgb(128, 128, 128)
 #define BACK            al_map_rgb(150, 175, 0)
+#define YELLOW          al_map_rgb(255, 255, 0)
 
+
+// --------------------------     GUI      -------------------------- //
+
+#define     NO_SELECTION        -1
 
 enum states { MAIN_WINDOW, OPEN_FILE };
 
 enum actions { NOTHING, NOTIFY_NEW_PATH, SEARCH_FILES, CALC_MERKLE, SHOW_TREE };
+
 
 typedef struct {
     std::string blockID;
@@ -78,8 +81,6 @@ public:
 
     void setMerkleTree(std::vector <std::string>);
 
-
-
     void setBlockInfo(std::string blockID, std::string previousBlockID, int cantTransactions, int blockNumber, int nonce);
 
     bool isNewPath();
@@ -89,8 +90,6 @@ public:
     ALLEGRO_DISPLAY* display;
 
     void drawMerkleTree();
-
-    
 
 private:
 

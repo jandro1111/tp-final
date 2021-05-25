@@ -172,7 +172,10 @@ int blockchain::getoutputIndex(nlohmann::json vin)
 {
     return  vin.at("outputIndex");
 }
+
+
 //  calcula el merkle root
+/*
 std::string blockchain::calculatemerkleroot(int num)
 {
     int itx = 0;
@@ -259,13 +262,11 @@ std::string blockchain::calculatemerkleroot(int num)
     //antes de repetir verificar paridad
     //meter datos en un tree
 
-    /*
-    
-    */
-
 
     return merkleroot;
 }
+*/
+
 //  SETTERS
 // set block id
 void blockchain::setblockid(int num, string id) {

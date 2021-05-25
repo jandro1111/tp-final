@@ -108,5 +108,11 @@
     <Font Include="Fonts\OpenSans-Semibold.ttf">
       <Filter>Resource Files\Fonts</Filter>
     </Font>
+    <Font Include="Fonts\Roboto-Black.ttf">
+      <Filter>Resource Files\Fonts</Filter>
+    </Font>
+    <Font Include="Fonts\Roboto-Light.ttf">
+      <Filter>Resource Files\Fonts</Filter>
+    </Font>
   </ItemGroup>
 </Project>
