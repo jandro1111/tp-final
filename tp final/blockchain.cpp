@@ -370,3 +370,166 @@ void blockchain::settxid(int block, int tx, string id) {
         }
     }
 }
+//  set outputIndex
+void blockchain::setoutputIndex(int block, int tx, int ntxin, int out) {
+    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        nlohmann::json bloque = getblock(block);
+        int nTx = getnTx(bloque);
+        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+            return;
+        }
+        else {
+            nlohmann::json Tx = gettx(bloque, tx);
+            int nTxin = getnTxin(Tx);
+            if (ntxin < 0 || ntxin == nTxin) {//si esta fuera de rango
+                return;
+            }
+            else {
+                j[block].at("tx")[tx].at("vin")[ntxin].at("outputIndex") = out;
+            }
+        }
+    }
+}
+//set signature
+void blockchain::setsignature(int block, int tx, int ntxin, string signature) {
+    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        nlohmann::json bloque = getblock(block);
+        int nTx = getnTx(bloque);
+        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+            return;
+        }
+        else {
+            nlohmann::json Tx = gettx(bloque, tx);
+            int nTxin = getnTxin(Tx);
+            if (ntxin < 0 || ntxin == nTxin) {//si esta fuera de rango
+                return;
+            }
+            else {
+                j[block].at("tx")[tx].at("vin")[ntxin].at("signature") = signature;
+            }
+        }
+    }
+}
+//  set amount
+void blockchain::setamount(int block, int tx, int ntxout, int amount) {
+    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        nlohmann::json bloque = getblock(block);
+        int nTx = getnTx(bloque);
+        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+            return;
+        }
+        else {
+            nlohmann::json Tx = gettx(bloque, tx);
+            int nTxout = getnTxout(Tx);
+            if (ntxout < 0 || ntxout == nTxout) {//si esta fuera de rango
+                return;
+            }
+            else {
+                j[block].at("tx")[tx].at("vout")[ntxout].at("amount") = amount;
+            }
+        }
+    }
+}
+
+//  set publicid
+void blockchain::setpublicid(int block, int tx, int ntxout, string publicid) {
+    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        nlohmann::json bloque = getblock(block);
+        int nTx = getnTx(bloque);
+        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+            return;
+        }
+        else {
+            nlohmann::json Tx = gettx(bloque, tx);
+            int nTxout = getnTxout(Tx);
+            if (ntxout < 0 || ntxout == nTxout) {//si esta fuera de rango
+                return;
+            }
+            else {
+                j[block].at("tx")[tx].at("vout")[ntxout].at("publicid") = publicid;
+            }
+        }
+    }
+}
+//  set vout
+void blockchain::setvout(int block, int tx, int amount, string publicid) {
+    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        nlohmann::json bloque = getblock(block);
+        int nTx = getnTx(bloque);
+        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+            return;
+        }
+        else {//creo un nuevo vout e incremento nTxout
+            string aux;
+            nlohmann::json bloque, Tx, aux1;
+            bloque = getblock(block);//pasar num como si fuese un indice
+            Tx = gettx(bloque, tx);//pasar num como indice
+            aux = str(boost::format("{\"amount\": %1% ,\"publicid\" : \"%2%\"}") % amount % publicid);
+            aux1 = nlohmann::json::parse(aux);
+            setnTxout(block, tx, getnTxout(Tx) + 1);
+            j[block].at("tx")[tx].at("vout")[getnTxout(Tx)] = aux1;//apunta al nuevo elemento del arreglo
+        }
+    }
+}
+//  set vin
+void blockchain::setvin(int block, int tx, string blockid, int out, string signature, string txid) {
+    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        nlohmann::json bloque = getblock(block);
+        int nTx = getnTx(bloque);
+        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+            return;
+        }
+        else {//creo un nuevo vout e incremento nTxout
+            string aux;
+            nlohmann::json bloque, Tx, aux1;
+            bloque = getblock(block);//pasar num como si fuese un indice
+            Tx = gettx(bloque, tx);//pasar num como indice
+            aux = str(boost::format("{ \"blockid\": \"%1%\",\"outputIndex\" : %2%,\"signature\" : \"%3%\",\"txid\" : \"%4%\" }") % blockid % out % signature % txid);
+            aux1 = nlohmann::json::parse(aux);
+            setnTxin(block, tx, getnTxin(Tx) + 1);
+            j[block].at("tx")[tx].at("vin")[getnTxin(Tx)] = aux1;//apunta al nuevo elemento del arreglo
+        }
+    }
+}
+//set tx
+void blockchain::settx(int block, string txid) {
+    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+        return;
+    }
+    else {
+        string aux;
+        nlohmann::json bloque, aux1;
+        bloque = getblock(block);//pasar num como si fuese un indice
+        aux = str(boost::format("{\"nTxin\": 0,\"nTxout\" : 0,\"txid\" : \"%1%\",\"vin\" : [] ,\"vout\": []}") % txid);
+        aux1 = nlohmann::json::parse(aux);
+        setnTx(block, getnTx(bloque) + 1);
+        j[block].at("tx")[getnTx(bloque)] = aux1;//apunta al nuevo elemento del arreglo
+    }
+}
+// set block
+void blockchain::setblock(std::string blockid, int height, std::string merkleroot, int nonce) {
+    string aux;
+    nlohmann::json aux1;
+    aux = str(boost::format("{ \"blockid\": \"%1%\",\"height\" : %2%,\"merkleroot\" : \"%3%\",\"nTx\" : 0,\"nonce\" : %4%,\"previousblockid\" : \"%5%\",\"tx\" : [] }") % blockid % height % merkleroot % nonce % getblockid(getblock(cantblocks - 1)));
+    aux1 = nlohmann::json::parse(aux);
+    j[cantblocks] = aux1;//apunta al nuevo elemento del arreglo
+    cantblocks++;
+}

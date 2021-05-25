@@ -36,6 +36,14 @@ public:
 	void setnTxin(int block, int tx, int);//recibe el numero de bloque, de transaccion y de ntxin
 	void setnTxout(int block, int tx, int);//recibe el numero de bloque, de transaccion y de ntxout
 	void settxid(int block, int tx, std::string);//recibe el numero de bloque, de transaccion y de txid
+	void setoutputIndex(int block, int tx, int ntxin, int outputindex);//recibe el numero de bloque, de transaccion,de txid y el outputindex
+	void setsignature(int block, int tx, int ntxin, std::string signature);//recibe el numero de bloque, de transaccion,de txid y la signature
+	void setamount(int block, int tx, int ntxout, int amount);//recibe el numero de bloque, de transaccion,de txid y el amount
+	void setpublicid(int block, int tx, int ntxout, std::string publicid);//recibe el numero de bloque, de transaccion,de txid y el publicid
+	void setvout(int block, int tx, int amount, std::string publicid);//recive el numero de bloque, de transaccion, el nuevo amount y el nuevo publicid
+	void setvin(int block, int tx, std::string blockid, int out, std::string signature, std::string txid);//recive el numero de bloque, de transaccion, el nuevo vin
+	void settx(int block, std::string txid);//recive el numero de bloque y el id de la nueva transaccion, esta empieza con 0 ntxin ntxout
+	void setblock(std::string blockid, int height, std::string merkleroot, int nonce);//setea un nuevo bloque con 0 transacciones
 //otras funciones
 	//std::string calculatemerkleroot(int);//recibe el numero del bloque del cual va a querer calcular el merkleroot, devuelve null si es un numero de bloque no valido
 	void calculatecantblocks(void); //calcula cuantos bloques hay en la blockchain
