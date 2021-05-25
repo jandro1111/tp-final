@@ -65,12 +65,6 @@ int main()
 	al_register_event_source(queue, al_get_mouse_event_source());
 	al_register_event_source(queue, al_get_timer_event_source(timer));
 
-	//PRUEBA
-	vector <std::string> tree;
-	for (int i = 0; i < 12; i++) {
-		tree.push_back("1234");
-	}
-
 
 	al_start_timer(timer);
 	while (running) {
@@ -92,7 +86,7 @@ int main()
 					ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
 					// ---------- Widgets y ventanas  ---------- //
-					myGui.mainWindow();
+					myGui.GUIwindow();
 
 					//De haberse seleccionado algun archivo, se lo accede y se pasa la información de los bloques
 					if (myGui.isNewPath()) {
@@ -106,15 +100,16 @@ int main()
 							}
 						}
 					}
-					if (myGui.getSelectedBlock() != NO_SELECTION) {
-						//myGui.setMerkleRoot();
-						myGui.setMerkleTree(tree);
+					int selectedBlock = myGui.getSelectedBlock();
+					if (selectedBlock != NO_SELECTION) {
+						blockchain myBlockchain(myGui.getSelectedFile());
+						myGui.setMerkleRoot(myBlockchain.calculatemerkleroot(selectedBlock));
+						myGui.setMerkleTree(myBlockchain.calculatemerkletree(selectedBlock));
 					}
 
 					// ---------- Rendering  ---------- //
 					ImGui::Render();
 
-					//al_clear_to_color(al_map_rgba_f(1, 1, 0.8, 1));
 					al_clear_to_color(BLACK);
 					//Todo lo que dibuje aca va a quedar por detrás de las ventanas de DearImGui
 
@@ -126,6 +121,7 @@ int main()
 					if (myGui.isMerkleTree()) {
 						myGui.drawMerkleTree();
 					}
+
 					myGui.update();
 				}
 				break;
@@ -135,9 +131,9 @@ int main()
 				break;
 
 			case ALLEGRO_EVENT_DISPLAY_RESIZE:
-				ImGui_ImplAllegro5_InvalidateDeviceObjects();
-				al_acknowledge_resize(myGui.display);
-				ImGui_ImplAllegro5_CreateDeviceObjects();
+				//ImGui_ImplAllegro5_InvalidateDeviceObjects();
+				//al_acknowledge_resize(myGui.display);
+				//ImGui_ImplAllegro5_CreateDeviceObjects();
 				break;
 			}
 		}
@@ -148,9 +144,9 @@ int main()
 	ImGui::DestroyContext();
 
 	//Destructores Allegro
-	myGui.destroyAllegro();
 	al_destroy_timer(timer);
 	al_destroy_event_queue(queue);
+	myGui.destroyAllegro();
 
 	return 0;
 }

@@ -24,7 +24,7 @@
 #define     BUFFER_SIZE_X       710
 #define     BUFFER_SIZE_Y       280 
 
-#define     FPS                 12
+#define     FPS                 10
 
 #define     TREE_FONT           "./Fonts/Roboto-Light.ttf"
 
@@ -46,7 +46,7 @@ enum states { MAIN_WINDOW, OPEN_FILE };
 
 enum actions { NOTHING, NOTIFY_NEW_PATH, SEARCH_FILES, CALC_MERKLE, SHOW_TREE };
 
-
+//Estructura que guarda la informacion a mostrar al usuario del bloque deseado
 typedef struct {
     std::string blockID;
     std::string previousBlockID;
@@ -55,71 +55,107 @@ typedef struct {
     int nonce;
 } BlockInfo;
 
-
+/*La clase Gui contiene los metodos que hacen a la GUI del usuario y la graficacion con allegro. */
 class Gui {
 public:
-
+    //Constructor
     Gui();
 
-    void mainWindow();
+    //Metodo pricipal de la GUI. Control y graficacion de los estados y sus acciones.
+    void GUIwindow();
 
+    //Inicializacion de ImGui y Allegro. 
     bool initGUI();
 
-    bool configEvents();
-
-    void configImGui();
-
+    //Llamado a los metodos de destroy y shutdown de Allegro. 
     void destroyAllegro();
 
+    //Contiene al flip display de Allegro.
     void update();
 
+    //Devuelve el path ya verificado al archivo seleccionado
     std::string getSelectedFile(void);
 
+    //Devuelve Block deseado dentro del archivo json. 
     int getSelectedBlock(void);
 
+    //Setter del Merkle Root.
     void setMerkleRoot(std::string merkleRoot);
 
+    //Setter del Merkle Tree.
     void setMerkleTree(std::vector <std::string>);
 
+    //Setter de informacion primordial del bloque
     void setBlockInfo(std::string blockID, std::string previousBlockID, int cantTransactions, int blockNumber, int nonce);
 
+    //Notificacion de nuevo path introducido por el usuario.
     bool isNewPath();
 
+    //Notificacion de necesidad de actualizar Merkle Tree. 
     bool isMerkleTree();
 
-    ALLEGRO_DISPLAY* display;
-
+    //Graficacion de Merkle Tree
     void drawMerkleTree();
+
+    //Display de Allegro
+    ALLEGRO_DISPLAY* display;
 
 private:
 
+    //Inicializacion de addons y variables de Allegro.
     bool initAllegro();
 
-    int doAction;
+    //Configuracion de ImGui.
+    void configImGui();
 
+    //Variables de Allegro.
     ALLEGRO_BITMAP* buffer;
     ALLEGRO_FONT* font;
 
-    bool closeWindow;
+    //Variable de control de acciones. 
+    int doAction;
 
+    //Variable de control de estados. 
     int state;
-
+    
+    //Flags de notificacion de nuevos merkle root y merkle tree.
+    bool newMerkleTree;
     bool newMerkleRoot;
-
+   
+    //Merkle Root del bloque seleccionado
     std::string merkleRoot;
+
+    //Merkle Tree del bloque seleccionado
     std::vector <std::string> merkleTree;
 
+    //Variable para guardar el path introducido por el usuario.
     char pathName[50] = { 0 };
 
+    //Archivos json del path seleccionado.
     std::vector<std::filesystem::path> files;
+
+    //Path a los directorios del path seleccionado.
     std::vector<std::filesystem::path> dirs;
+
+    //Variable para moverse por los directorios.
     std::filesystem::path currentPath;
+
+    //Guarda el path seleccionado para que se pueda recuperar con el getter
     std::filesystem::path selectedPath;
+
+    //Variable para seleccion de los files con RadiusButton de ImGui
     int selectedFile;
+
+    //Variable para seleccion de los bloques con RadiusButton de ImGui
     int selectedBlock;
 
+    //Variable para controlar cambio de bloque seleccionado y optimizar el programa
+    int currentBlock;
+
+    //Instancia de la clase File para navegar un directorio
     Files path;
 
+    //Guarda informacion de todos los bloques del archivo seleccionado
     std::vector<BlockInfo> blockInfo;
 };
 

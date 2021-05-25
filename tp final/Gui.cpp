@@ -2,8 +2,8 @@
 
 using namespace std;
 
+//Constructor. Seteo de variables.
 Gui::Gui() {
-    closeWindow = false;
     display = NULL;
     buffer = NULL;
     font = NULL;
@@ -11,11 +11,14 @@ Gui::Gui() {
     doAction = NOTHING;
     selectedFile = 0;
     selectedBlock = 0;
+    currentBlock = NO_SELECTION;
     merkleRoot = "";
     merkleTree.clear();
     newMerkleRoot = false;
+    newMerkleTree = false;
 }
 
+//Inicializacion de Allegro e ImGui.
 bool Gui::initGUI()
 {
     if (!initAllegro()) {
@@ -31,13 +34,12 @@ bool Gui::initGUI()
 
     al_set_window_title(this->display, "Blockchain");
 
-    configEvents();
-
     configImGui();
 
     return true;
 }
 
+//Configuracion de ImGui
 void Gui::configImGui(void)
 {
     IMGUI_CHECKVERSION();
@@ -46,9 +48,10 @@ void Gui::configImGui(void)
     ImGui::StyleColorsDark();
 }
 
-void Gui::mainWindow()
+//Metodo pricipal de la GUI. Control y graficacion de los estados y sus acciones.
+void Gui::GUIwindow()
 {
-
+    //Flags de ImGui
     static bool NoTitlebar = false;
     static bool NoMenu = true;
     static bool NoCollapse = false;
@@ -74,13 +77,18 @@ void Gui::mainWindow()
     ImGuiSliderFlags log_slider = reg_slider | ImGuiSliderFlags_Logarithmic;
     const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
 
+
+    //Variable de control de ventana de ImGui
     static bool windowActive = true;
 
-
+    //Widgets y acciones segun estado. 
     switch (this->state) {
+
+    //MAIN_WINDOW: widgets y acciones sobre los bloques cargados del archivo seleccionado en FILES.
     case MAIN_WINDOW:
         ImGui::SetNextWindowSize(ImVec2(DISPLAY_SIZE_X, DISPLAY_SIZE_Y), ImGuiCond_Always);
         ImGui::Begin("Main", &windowActive, ImGuiWindowFlags_MenuBar);
+        //Menu Bar
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("Main"))
@@ -92,11 +100,13 @@ void Gui::mainWindow()
             if (ImGui::BeginMenu("File"))
             {
                 state = OPEN_FILE;
+                doAction = NOTHING;
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
         }
 
+        //En caso de haber un archivo seleccionado, se disponen los bloques.
         if (selectedPath.string() != "") {
 
             ImGui::TextColored(ImVec4(1, 1, 0, 1), "Selected file: "); ImGui::SameLine();
@@ -119,6 +129,7 @@ void Gui::mainWindow()
                         doAction = NOTHING;
                         merkleRoot = "";
                         merkleTree.clear();
+                        newMerkleRoot = true;
                     }
                     if (doAction == CALC_MERKLE && merkleRoot != "") {
                         ImGui::TextColored(ImVec4(1, 1, 0, 1), ("Block " + std::to_string(selectedBlock) + ":").c_str());
@@ -136,6 +147,10 @@ void Gui::mainWindow()
                     for (int i = 0; i != blockInfo.size(); i++) {
                         ImGui::RadioButton(("Block " + std::to_string(i)).c_str(), &selectedBlock, i);
                         if (selectedBlock == i) {
+                            if (currentBlock != selectedBlock) {
+                                currentBlock = selectedBlock;
+                                newMerkleRoot = true;
+                            }
                             ImGui::Indent(); ImGui::Indent();
                             ImGui::Text(("Block ID: " + blockInfo[i].blockID).c_str());
                             ImGui::Text(("Previous block ID: " + blockInfo[i].previousBlockID).c_str());
@@ -155,10 +170,13 @@ void Gui::mainWindow()
         ImGui::End();
         break;
 
+    //OPEN_FILE: navegacion y seleccion sobre el path introducido por el usuario.
     case OPEN_FILE:
 
         ImGui::SetNextWindowSize(ImVec2(DISPLAY_SIZE_X, DISPLAY_SIZE_Y), ImGuiCond_Always);
         ImGui::Begin("File", &windowActive, ImGuiWindowFlags_MenuBar);
+
+        //Mismas Menu Bar
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("Main"))
@@ -170,6 +188,7 @@ void Gui::mainWindow()
             if (ImGui::BeginMenu("File"))
             {
                 state = OPEN_FILE;
+                doAction = NOTHING;
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
@@ -204,6 +223,7 @@ void Gui::mainWindow()
         }
         ImGui::Separator();
 
+        //Navegacion por el directorio del path introducido
         if (doAction == SEARCH_FILES) {
 
             //Seleccion del archivo JSON
@@ -216,6 +236,7 @@ void Gui::mainWindow()
                     state = MAIN_WINDOW;
                     doAction = NOTIFY_NEW_PATH;
                     selectedBlock = 0;
+                    currentBlock = NO_SELECTION;
                 }
                 //Se ingresa en directorio
                 else {
@@ -281,15 +302,20 @@ void Gui::mainWindow()
     }
 }
 
-void Gui::drawMerkleTree(void) {
 
+//Graficacion de Merkle Tree
+void Gui::drawMerkleTree(void) {
+    //Grafica sobre el buffer
     al_set_target_bitmap(buffer);
     al_clear_to_color(BLACK);
+    
+    //Variables para calculo de dimensiones del buffer segun altura del arbol.
     static int treeHeight = 0;
     static int treeNodes = 1;
     static int sizeY = (int)(BUFFER_SIZE_Y / (treeHeight + 1));;
     static int fontSize = 0;
-    if (newMerkleRoot) {
+    //Por optimizacion, se recalcula solamente al introducir un nuevo merkle tree.
+    if (newMerkleTree) {
         while (treeNodes < (int)merkleTree.size()) {
             treeNodes *= 2;
             treeHeight++;
@@ -304,26 +330,27 @@ void Gui::drawMerkleTree(void) {
         newMerkleRoot = false;
     }
 
-    //El primer for itera por los niveles del arbol.
-    int node = 0;
+    int node = merkleTree.size();
     int i = 1;
+    //El primer for itera por los niveles del arbol.
     for (int height = 0; height != treeHeight; height++, i *= 2) {
+        //El segundo for grafica los nodos en cada nivel.
         int sizeX = (int)(BUFFER_SIZE_X / (i + 1));
-        for (int j = 0; j < i; j++) {
-            if (node != merkleTree.size()) {
-                al_draw_text(font, WHITE, sizeX * (j + 1), sizeY * (height), ALLEGRO_ALIGN_CENTRE, merkleTree[node].c_str());
+        for (int j = i; j > 0; j--) {
+            if (node != 0) {
+                al_draw_text(font, WHITE, sizeX * (j), sizeY * (height), ALLEGRO_ALIGN_CENTRE, merkleTree[node-1].c_str());
                 if (height == (treeHeight - 1)) {
-                    al_draw_text(font, YELLOW, sizeX * (j + 1), sizeY * (height + 1), ALLEGRO_ALIGN_CENTRE, ("T" + std::to_string(j)).c_str());
-                    al_draw_line(sizeX * (j + 1), sizeY * (height + 1) - fontSize, sizeX * (j + 1), sizeY * (height + 1 ) - fontSize * 2, WHITE, (float)(10.0 / treeHeight));
+                    al_draw_text(font, YELLOW, sizeX * (j), sizeY * (height + 1), ALLEGRO_ALIGN_CENTRE, ("T" + std::to_string(j - 1)).c_str());
+                    al_draw_line(sizeX * (j), sizeY * (height + 1) - fontSize, sizeX * (j), sizeY * (height + 1 ) - fontSize * 2, WHITE, (float)(8.0 / treeHeight));
                 }
                 if (i > 1) {
                     //En el caso de ser par
                     if ((j % 2) == 0) {
-                        al_draw_line(sizeX * (j + 1), sizeY * (height)-fontSize, sizeX * (j + 2), sizeY * (height) - fontSize, WHITE, (float)(10.0 / treeHeight));
-                        al_draw_line(sizeX * (j + 1) + (int)(sizeX/2), sizeY * (height) - fontSize, sizeX * (j + 1) + (int)(sizeX / 2), sizeY * (height) - fontSize * 2, WHITE, (float)(10.0 / treeHeight));
+                        al_draw_line(sizeX * (j), sizeY * (height)-fontSize, sizeX * (j - 1), sizeY * (height) - fontSize, WHITE, (float)(8.0 / treeHeight));
+                        al_draw_line(sizeX * (j) - (int)(sizeX/2), sizeY * (height) - fontSize, sizeX * (j) - (int)(sizeX / 2), sizeY * (height) - fontSize * 2, WHITE, (float)(10.0 / treeHeight));
                     }
                 }
-                node++;
+                node--;
             }
         }
     }
@@ -332,45 +359,54 @@ void Gui::drawMerkleTree(void) {
     al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_SIZE_X, BUFFER_SIZE_Y, 5, DISPLAY_SIZE_Y - BUFFER_SIZE_Y, BUFFER_SIZE_X, DISPLAY_SIZE_Y, 0);
 }
 
+//Devuelve Block deseado dentro del archivo json. 
 std::string Gui::getSelectedFile(void) {
-    blockInfo.clear();  //Limpia vector con info de los bloques del json
+    if(doAction != CALC_MERKLE)
+        doAction = NOTHING;
     return selectedPath.string();
 }
 
+//Setter de informacion primordial del bloque
 void Gui::setBlockInfo(std::string blockID, std::string previousBlockID, int cantTransactions, int blockNumber, int nonce) {
     BlockInfo block = { blockID, previousBlockID, cantTransactions, blockNumber, nonce };
     blockInfo.push_back(block);
 }
 
+//Notificacion de nuevo path introducido por el usuario.
 bool Gui::isNewPath() {
-    return (doAction == NOTIFY_NEW_PATH);
+    if (doAction == NOTIFY_NEW_PATH) {
+        blockInfo.clear();  //Limpia vector con info de los bloques del json
+        return true;
+    }
+    return false;
 }
 
+//Notificacion de necesidad de actualizar Merkle Tree. 
+bool Gui::isMerkleTree() {
+    return (doAction == SHOW_TREE);
+}
+
+//Devuelve Block deseado dentro del archivo json.
 int Gui::getSelectedBlock() {
-    if ((doAction == CALC_MERKLE && merkleRoot == "") || (doAction == SHOW_TREE && merkleTree.size() == 0)) {
+    if (newMerkleRoot) {
+        newMerkleRoot = false;
         return selectedBlock;
     }
     return NO_SELECTION;
 }
 
+//Setter del Merkle Root.
 void Gui::setMerkleRoot(std::string merkleRoot) {
     this->merkleRoot = merkleRoot;
 }
 
+//Setter del Merkle Tree.
 void Gui::setMerkleTree(std::vector <std::string> merkle) {
     merkleTree = merkle;
-    newMerkleRoot = true;
+    newMerkleTree = true;
 }
 
-bool Gui::isMerkleTree() {
-    return (doAction == SHOW_TREE);
-}
-
-bool Gui::configEvents()
-{
-    return true;
-}
-
+//Inicializacion de addons y variables de Allegro.
 bool Gui::initAllegro(void)
 {
     if (!al_init()) {
@@ -420,17 +456,16 @@ bool Gui::initAllegro(void)
     return true;
 }
 
-
+//Llamado a los metodos de destroy y shutdown de Allegro. 
 void Gui::destroyAllegro(void)
 {
     al_destroy_font(font);
     al_destroy_bitmap(buffer);
-    al_destroy_display(display);
 
-    al_shutdown_ttf_addon();
     al_shutdown_font_addon();
     al_shutdown_primitives_addon();
     al_shutdown_image_addon();
+    al_destroy_display(display);
 }
 
 void Gui::update(void)
