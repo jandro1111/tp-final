@@ -43,7 +43,7 @@ public:
 	void setvout(int block, int tx, int amount, std::string publicid);//recive el numero de bloque, de transaccion, el nuevo amount y el nuevo publicid
 	void setvin(int block, int tx, std::string blockid, int out, std::string signature, std::string txid);//recive el numero de bloque, de transaccion, el nuevo vin
 	void settx(int block, std::string txid);//recive el numero de bloque y el id de la nueva transaccion, esta empieza con 0 ntxin ntxout
-	void setblock(std::string blockid, int height, std::string merkleroot, int nonce);//setea un nuevo bloque con 0 transacciones
+	void setblock(std::string blockid,  std::string merkleroot, int nonce);//setea un nuevo bloque con 0 transacciones
 //otras funciones
 	std::string calculatemerkleroot(int);//recibe el numero del bloque del cual va a querer calcular el merkleroot, devuelve null si es un numero de bloque no valido
 	std::vector<std::string> calculatemerkletree(int);

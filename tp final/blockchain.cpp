@@ -518,10 +518,10 @@ void blockchain::settx(int block, string txid) {
     }
 }
 // set block
-void blockchain::setblock(std::string blockid, int height, std::string merkleroot, int nonce) {
+void blockchain::setblock(std::string blockid,  std::string merkleroot, int nonce) {
     string aux;
     nlohmann::json aux1;
-    aux = str(boost::format("{ \"blockid\": \"%1%\",\"height\" : %2%,\"merkleroot\" : \"%3%\",\"nTx\" : 0,\"nonce\" : %4%,\"previousblockid\" : \"%5%\",\"tx\" : [] }") % blockid % height % merkleroot % nonce % getblockid(getblock(cantblocks - 1)));
+    aux = str(boost::format("{ \"blockid\": \"%1%\",\"height\" : %2%,\"merkleroot\" : \"%3%\",\"nTx\" : 0,\"nonce\" : %4%,\"previousblockid\" : \"%5%\",\"tx\" : [] }") % blockid % cantblocks % merkleroot % nonce % getblockid(getblock(cantblocks - 1)));
     aux1 = nlohmann::json::parse(aux);
     j[cantblocks] = aux1;//apunta al nuevo elemento del arreglo
     cantblocks++;
