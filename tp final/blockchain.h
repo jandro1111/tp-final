@@ -45,7 +45,8 @@ public:
 	void settx(int block, std::string txid);//recive el numero de bloque y el id de la nueva transaccion, esta empieza con 0 ntxin ntxout
 	void setblock(std::string blockid, int height, std::string merkleroot, int nonce);//setea un nuevo bloque con 0 transacciones
 //otras funciones
-	//std::string calculatemerkleroot(int);//recibe el numero del bloque del cual va a querer calcular el merkleroot, devuelve null si es un numero de bloque no valido
+	std::string calculatemerkleroot(int);//recibe el numero del bloque del cual va a querer calcular el merkleroot, devuelve null si es un numero de bloque no valido
+	std::vector<std::string> calculatemerkletree(int);
 	void calculatecantblocks(void); //calcula cuantos bloques hay en la blockchain
 private:
 	nlohmann::json j;// el blockchain

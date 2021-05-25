@@ -175,98 +175,91 @@ int blockchain::getoutputIndex(nlohmann::json vin)
 
 
 //  calcula el merkle root
-/*
-std::string blockchain::calculatemerkleroot(int num)
+std::vector<std::string> blockchain::calculatemerkletree(int num)
 {
     int itx = 0;
     int itxin = 0;
     string aux = "";
-    string merkleroot="";
+
+    vector<string> temp;
+    vector<string> temp2;
+    vector<string> fullMerkleTree; //Contiene todo el merkle tree, empezando por hojas y terminando por el root
+
     list<string> hojas;
-    nlohmann::json bloque,tx,vin;
+    nlohmann::json bloque, tx, vin;
     if (getblock(num) == nulljson) {//ese bloque no existe
-        return merkleroot;
+        return fullMerkleTree;
     }
     bloque = getblock(num);
     itx = getnTx(bloque);
     for (int i = 0; i < itx; ++i) {//creo un lista con las hojas
-        tx = gettx(bloque,i);
+        tx = gettx(bloque, i);
         itxin = getnTxin(tx);
         for (int j = 0; j < itxin; j++) {
             vin = getvin(tx, j);
             aux += gettxid(vin);
         }
         aux = int2hex(generateID(aux.c_str()));
+
         aux.resize(8);
         aux.shrink_to_fit();
         hojas.push_back(aux);
-        if (((itx%2)!=0)&& (i == itx - 1)) {//si estoy en la ultima hoja, y esta es impar, la vuelvo a agregar a la lista
+        if (((itx % 2) != 0) && (i == itx - 1)) {//si estoy en la ultima hoja, y esta es impar, la vuelvo a agregar a la lista
             hojas.push_back(aux);
         }
         aux = "";
     }
-    cout << "tx ids, osea hojas: " << endl;
-    for (auto n : hojas) {
-        static int k= 1;
-        cout << "hoja"<<k<<": "<<n.substr()<<endl;
-        k++;
-    }
-    // hasta aca calcula las hojas
-    //
-    bool par = false;
-    int index = 0;//4,6,7
 
-    vector<string> temp;
-    vector<string> fullMerkleTree; //Contiene todo el merkle tree, empezando por hojas y terminando por el root
+    // hasta aca calcula las hojas
 
     for (std::list<string>::iterator it = hojas.begin(); it != hojas.end(); ++it) {
-        if (par == false) {//si me falta concatenar un elemento
-            aux += *it;
-            par = true;
-        }
-        else {
-            aux += *it;
-            aux = int2hex(generateID(aux.c_str()));
-            temp.push_back(aux); // Cargo todos los id a una lista "temp"
-            fullMerkleTree.push_back(aux);
-            cout << aux << endl;
-            index++;
-            //aca lo guardas en algun lado
-            aux = "";
-            par = false;
-        }
+        temp.push_back(*it);
+        fullMerkleTree.push_back(*it);
     }
-    while(temp.size() > 1){   
-        string newID;
-        unsigned int i = 0;
-        for (std::vector<string>::iterator it = temp.begin(); it != temp.end(); it++, i++) {
-            if(((i + 1) = temp.end()) && (temp.size() % 2 == 1)){ // si es impar y estoy en el ultimo lugar, agrego uno igual al final
-                temp.push_back(temp[i]);
+
+    string newID;
+    if (temp.size() == 1) {
+        cout << "Block only has one trsnaction!" << endl;
+    }
+    else {
+        while (temp.size() != 1 && temp2.size() != 1) {
+            for (vector<string>::iterator it = temp.begin(); it != temp.end(); it++) {
+                if (((it + 1) == temp.end()) && ((temp.size() % 2) == 1)) { // si es impar y estoy en el ultimo lugar, agrego uno igual al final
+                    temp.push_back(*it);
+                }
+                newID = *it;
+                newID += *(it + 1);
+                newID = int2hex(generateID(newID.c_str()));
+                temp2.push_back(newID);
+                fullMerkleTree.push_back(newID);
+                it++;
             }
-            newID = temp[i];
-            temp.erase(i);
-            newID += temp[i];
-            temp.erase(i);
-            newID = generateID(NewID.c_str());
-            temp.insert(i, newID);
-            fullMerkleTree.push_back(NewID);
+            temp.clear();
+            if (temp2.size() == 1) {
+                break;
+            }
+            for (vector<string>::iterator it = temp2.begin(); it != temp2.end(); it++) {
+                if (((it + 1) == temp2.end()) && ((temp2.size() % 2) == 1)) { // si es impar y estoy en el ultimo lugar, agrego uno igual al final
+                    temp2.push_back(*it);
+                }
+                newID = *it;
+                newID += *(it + 1);
+                newID = int2hex(generateID(newID.c_str()));
+                temp.push_back(newID);
+                fullMerkleTree.push_back(newID);
+                it++;
+            }
+            temp2.clear();
         }
     }
 
-    for (int i = 0; i < index; ++i) {//creo un lista con las hojas
-        if (((index % 2) != 0) && (i == index - 1)) {//si estoy en la ultima hoja, y esta es impar, la vuelvo a agregar a la lista
-            hojas.push_back(aux);
-        }
-    }
-    //repetir el for pero con los nodos ya calculados, idealmente hacer de este for una funcion o meterlo dentro de otro for
-    //antes de repetir verificar paridad
-    //meter datos en un tree
-
-
-    return merkleroot;
+    return fullMerkleTree;
 }
-*/
 
+// Calcula el merkle root
+std::string blockchain::calculatemerkleroot(int num) {
+    return calculatemerkletree(num).back();
+}
 //  SETTERS
 // set block id
 void blockchain::setblockid(int num, string id) {
