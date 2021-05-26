@@ -117,11 +117,11 @@ private:
 
     //Variable de control de estados. 
     int state;
-    
+
     //Flags de notificacion de nuevos merkle root y merkle tree.
     bool newMerkleTree;
     bool newMerkleRoot;
-   
+
     //Merkle Root del bloque seleccionado
     std::string merkleRoot;
 

@@ -26,17 +26,16 @@ bool Files::openDirectory() {
 				files.push_back(p);
 			}
 		}
+		//Si contiene varios archivos o subdirectorios, los busca, chequea y guarda. 
 		else {
 			for (const auto& entry : std::filesystem::directory_iterator(this->path)) {
 				if (this->isDirectory(entry)) {
 					dirs.push_back(entry.path());
-					//std::cout << "Folder " << entry.path().filename().string() << std::endl;
 				}
 				else {
 					if (std::filesystem::is_regular_file(entry)) {
 						if (entry.path().extension() == ".json") {
 							files.push_back(entry.path());
-							//std::cout << "File " << entry.path().filename().string() << std::endl;
 						}
 					}
 				}
@@ -53,17 +52,3 @@ std::vector<std::filesystem::path> Files::getFiles(void){
 std::vector<std::filesystem::path> Files::getDirs(void) {
 	return dirs;
 }
-
-
-//for (const auto& entry : std::filesystem::directory_iterator(this->path)) {
-//	if (this->isDirectory(entry)) {
-//		dirs.push_back(entry.path());
-//		std::cout << "Folder " << entry.path().filename().string() << std::endl;
-//	}
-//	else {
-//		if (entry.path().extension() == ".json") {
-//			files.push_back(entry.path());
-//			std::cout << "File " << entry.path().filename().string() << std::endl;
-//		}
-//	}
-//}

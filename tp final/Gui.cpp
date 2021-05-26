@@ -84,7 +84,7 @@ void Gui::GUIwindow()
     //Widgets y acciones segun estado. 
     switch (this->state) {
 
-    //MAIN_WINDOW: widgets y acciones sobre los bloques cargados del archivo seleccionado en FILES.
+        //MAIN_WINDOW: widgets y acciones sobre los bloques cargados del archivo seleccionado en FILES.
     case MAIN_WINDOW:
         ImGui::SetNextWindowSize(ImVec2(DISPLAY_SIZE_X, DISPLAY_SIZE_Y), ImGuiCond_Always);
         ImGui::Begin("Main", &windowActive, ImGuiWindowFlags_MenuBar);
@@ -170,7 +170,7 @@ void Gui::GUIwindow()
         ImGui::End();
         break;
 
-    //OPEN_FILE: navegacion y seleccion sobre el path introducido por el usuario.
+        //OPEN_FILE: navegacion y seleccion sobre el path introducido por el usuario.
     case OPEN_FILE:
 
         ImGui::SetNextWindowSize(ImVec2(DISPLAY_SIZE_X, DISPLAY_SIZE_Y), ImGuiCond_Always);
@@ -308,7 +308,7 @@ void Gui::drawMerkleTree(void) {
     //Grafica sobre el buffer
     al_set_target_bitmap(buffer);
     al_clear_to_color(BLACK);
-    
+
     //Variables para calculo de dimensiones del buffer segun altura del arbol.
     static int treeHeight = 0;
     static int treeNodes = 1;
@@ -322,12 +322,13 @@ void Gui::drawMerkleTree(void) {
         }
         sizeY = (int)(BUFFER_SIZE_Y / (treeHeight + 2));
         fontSize = (int)(BUFFER_SIZE_Y / (treeHeight * 6));
+        al_destroy_font(font);
         font = al_load_ttf_font(TREE_FONT, fontSize, 0);
         if (font == NULL) {
             fprintf(stderr, "failed to create font!\n");
             return;
         }
-        newMerkleRoot = false;
+        newMerkleTree = false;
     }
 
     int node = merkleTree.size();
@@ -338,16 +339,16 @@ void Gui::drawMerkleTree(void) {
         int sizeX = (int)(BUFFER_SIZE_X / (i + 1));
         for (int j = i; j > 0; j--) {
             if (node != 0) {
-                al_draw_text(font, WHITE, sizeX * (j), sizeY * (height), ALLEGRO_ALIGN_CENTRE, merkleTree[node-1].c_str());
+                al_draw_text(font, WHITE, sizeX * (j), sizeY * (height), ALLEGRO_ALIGN_CENTRE, merkleTree[node - 1].c_str());
                 if (height == (treeHeight - 1)) {
                     al_draw_text(font, YELLOW, sizeX * (j), sizeY * (height + 1), ALLEGRO_ALIGN_CENTRE, ("T" + std::to_string(j - 1)).c_str());
-                    al_draw_line(sizeX * (j), sizeY * (height + 1) - fontSize, sizeX * (j), sizeY * (height + 1 ) - fontSize * 2, WHITE, (float)(8.0 / treeHeight));
+                    al_draw_line(sizeX * (j), sizeY * (height + 1) - fontSize, sizeX * (j), sizeY * (height + 1) - fontSize * 2, WHITE, (float)(8.0 / treeHeight));
                 }
                 if (i > 1) {
                     //En el caso de ser par
                     if ((j % 2) == 0) {
-                        al_draw_line(sizeX * (j), sizeY * (height)-fontSize, sizeX * (j - 1), sizeY * (height) - fontSize, WHITE, (float)(8.0 / treeHeight));
-                        al_draw_line(sizeX * (j) - (int)(sizeX/2), sizeY * (height) - fontSize, sizeX * (j) - (int)(sizeX / 2), sizeY * (height) - fontSize * 2, WHITE, (float)(10.0 / treeHeight));
+                        al_draw_line(sizeX * (j), sizeY * (height)-fontSize, sizeX * (j - 1), sizeY * (height)-fontSize, WHITE, (float)(8.0 / treeHeight));
+                        al_draw_line(sizeX * (j)-(int)(sizeX / 2), sizeY * (height)-fontSize, sizeX * (j)-(int)(sizeX / 2), sizeY * (height)-fontSize * 2, WHITE, (float)(10.0 / treeHeight));
                     }
                 }
                 node--;
@@ -361,7 +362,7 @@ void Gui::drawMerkleTree(void) {
 
 //Devuelve Block deseado dentro del archivo json. 
 std::string Gui::getSelectedFile(void) {
-    if(doAction != CALC_MERKLE)
+    if (doAction != CALC_MERKLE)
         doAction = NOTHING;
     return selectedPath.string();
 }
@@ -402,6 +403,7 @@ void Gui::setMerkleRoot(std::string merkleRoot) {
 
 //Setter del Merkle Tree.
 void Gui::setMerkleTree(std::vector <std::string> merkle) {
+    merkleTree.clear();
     merkleTree = merkle;
     newMerkleTree = true;
 }
@@ -441,7 +443,6 @@ bool Gui::initAllegro(void)
         fprintf(stderr, "Failed to initialize font addon!\n");
         return false;
     }
-
     if (!al_init_ttf_addon())
     {
         fprintf(stderr, "Failed to initialize ttf addon!\n");
