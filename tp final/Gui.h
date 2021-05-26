@@ -80,7 +80,7 @@ public:
     int getSelectedBlock(void);
 
     //Setter del Merkle Root.
-    void setMerkleRoot(std::string merkleRoot);
+    void setMerkleRoot(std::string merkleRootCalculated, std::string merkleRootBlock);
 
     //Setter del Merkle Tree.
     void setMerkleTree(std::vector <std::string>);
@@ -122,8 +122,11 @@ private:
     bool newMerkleTree;
     bool newMerkleRoot;
 
-    //Merkle Root del bloque seleccionado
-    std::string merkleRoot;
+    //Merkle Root calculado del bloque seleccionado
+    std::string merkleRootCalculated;
+
+    //Merkle Root real del bloque seleccionado
+    std::string merkleRootBlock;
 
     //Merkle Tree del bloque seleccionado
     std::vector <std::string> merkleTree;

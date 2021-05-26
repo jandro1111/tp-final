@@ -68,7 +68,8 @@ int main()
 					int selectedBlock = myGui.getSelectedBlock();
 					if (selectedBlock != NO_SELECTION) {
 						blockchain myBlockchain(myGui.getSelectedFile());
-						myGui.setMerkleRoot(myBlockchain.calculatemerkleroot(selectedBlock));
+						nlohmann::json block = myBlockchain.getblock(selectedBlock);
+						myGui.setMerkleRoot(myBlockchain.calculatemerkleroot(selectedBlock), myBlockchain.getmerkleroot(block));
 						myGui.setMerkleTree(myBlockchain.calculatemerkletree(selectedBlock));
 					}
 

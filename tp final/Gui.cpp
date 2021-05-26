@@ -12,7 +12,8 @@ Gui::Gui() {
     selectedFile = 0;
     selectedBlock = 0;
     currentBlock = NO_SELECTION;
-    merkleRoot = "";
+    merkleRootCalculated = "";
+    merkleRootBlock= "";
     merkleTree.clear();
     newMerkleRoot = false;
     newMerkleTree = false;
@@ -127,15 +128,16 @@ void Gui::GUIwindow()
                     ImGui::SameLine();
                     if (ImGui::Button("Close")) {
                         doAction = NOTHING;
-                        merkleRoot = "";
+                        merkleRootCalculated = "";
+                        merkleRootBlock = "";
                         merkleTree.clear();
                         newMerkleRoot = true;
                     }
-                    if (doAction == CALC_MERKLE && merkleRoot != "") {
+                    if (doAction == CALC_MERKLE && merkleRootCalculated != "") {
                         ImGui::TextColored(ImVec4(1, 1, 0, 1), ("Block " + std::to_string(selectedBlock) + ":").c_str());
                         ImGui::Indent();
-                        ImGui::Text(("Calulated: " + merkleRoot).c_str());
-                        ImGui::Text(("Block's: " + merkleRoot).c_str());
+                        ImGui::Text(("Calulated: " + merkleRootCalculated).c_str());
+                        ImGui::Text(("Block's: " + merkleRootBlock).c_str());
                     }
                 }
                 ImGui::Separator();
@@ -396,9 +398,10 @@ int Gui::getSelectedBlock() {
     return NO_SELECTION;
 }
 
-//Setter del Merkle Root.
-void Gui::setMerkleRoot(std::string merkleRoot) {
-    this->merkleRoot = merkleRoot;
+//Setter del Merkle Root calculado y real del bloque.
+void Gui::setMerkleRoot(std::string merkleRootCalculated, std::string merkleRootBlock) {
+    this->merkleRootCalculated = merkleRootCalculated;
+    this->merkleRootBlock = merkleRootBlock;
 }
 
 //Setter del Merkle Tree.
