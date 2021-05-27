@@ -263,7 +263,7 @@ std::string blockchain::calculatemerkleroot(int num) {
 //  SETTERS
 // set block id
 void blockchain::setblockid(int num, string id) {
-    if (num < 0 || num == cantblocks) {//si esta fuera de rango
+    if (num < 0 || num <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
@@ -272,7 +272,7 @@ void blockchain::setblockid(int num, string id) {
 }
 //  set height
 void blockchain::setheight(int num, std::string height) {
-    if (num < 0 || num == cantblocks) {//si esta fuera de rango
+    if (num < 0 || num <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
@@ -281,7 +281,7 @@ void blockchain::setheight(int num, std::string height) {
 }
 // set merkleroot
 void blockchain::setmerkleroot(int num, std::string mk) {
-    if (num < 0 || num == cantblocks) {//si esta fuera de rango
+    if (num < 0 || num <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
@@ -290,7 +290,7 @@ void blockchain::setmerkleroot(int num, std::string mk) {
 }
 //  set nTx
 void blockchain::setnTx(int num, int nTx) {
-    if (num < 0 || num == cantblocks) {//si esta fuera de rango
+    if (num < 0 || num <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
@@ -299,7 +299,7 @@ void blockchain::setnTx(int num, int nTx) {
 }
 //  set nonce
 void blockchain::setnonce(int num, int nonce) {
-    if (num < 0 || num == cantblocks) {//si esta fuera de rango
+    if (num < 0 || num <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
@@ -308,7 +308,7 @@ void blockchain::setnonce(int num, int nonce) {
 }
 //  set previousblockid
 void blockchain::setpreviousblockid(int num, std::string pvid) {
-    if (num < 0 || num == cantblocks) {//si esta fuera de rango
+    if (num < 0 || num <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
@@ -317,13 +317,13 @@ void blockchain::setpreviousblockid(int num, std::string pvid) {
 }
 //  set ntxin
 void blockchain::setnTxin(int block, int tx, int in) {
-    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+    if (block < 0 || block <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
         nlohmann::json bloque = getblock(block);
         int nTx = getnTx(bloque);
-        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+        if (tx < 0 || tx <= nTx) {//si esta fuera de rango
             return;
         }
         else {
@@ -333,13 +333,13 @@ void blockchain::setnTxin(int block, int tx, int in) {
 }
 //  set ntxout
 void blockchain::setnTxout(int block, int tx, int out) {
-    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+    if (block < 0 || block <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
         nlohmann::json bloque = getblock(block);
         int nTx = getnTx(bloque);
-        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+        if (tx < 0 || tx <= nTx) {//si esta fuera de rango
             return;
         }
         else {
@@ -349,13 +349,13 @@ void blockchain::setnTxout(int block, int tx, int out) {
 }
 //  set txid
 void blockchain::settxid(int block, int tx, string id) {
-    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+    if (block < 0 || block <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
         nlohmann::json bloque = getblock(block);
         int nTx = getnTx(bloque);
-        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+        if (tx < 0 || tx <= nTx) {//si esta fuera de rango
             return;
         }
         else {
@@ -365,19 +365,19 @@ void blockchain::settxid(int block, int tx, string id) {
 }
 //  set outputIndex
 void blockchain::setoutputIndex(int block, int tx, int ntxin, int out) {
-    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+    if (block < 0 || block <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
         nlohmann::json bloque = getblock(block);
         int nTx = getnTx(bloque);
-        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+        if (tx < 0 || tx <= nTx) {//si esta fuera de rango
             return;
         }
         else {
             nlohmann::json Tx = gettx(bloque, tx);
             int nTxin = getnTxin(Tx);
-            if (ntxin < 0 || ntxin == nTxin) {//si esta fuera de rango
+            if (ntxin < 0 || ntxin <= nTxin) {//si esta fuera de rango
                 return;
             }
             else {
@@ -388,19 +388,19 @@ void blockchain::setoutputIndex(int block, int tx, int ntxin, int out) {
 }
 //set signature
 void blockchain::setsignature(int block, int tx, int ntxin, string signature) {
-    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+    if (block < 0 || block <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
         nlohmann::json bloque = getblock(block);
         int nTx = getnTx(bloque);
-        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+        if (tx < 0 || tx <= nTx) {//si esta fuera de rango
             return;
         }
         else {
             nlohmann::json Tx = gettx(bloque, tx);
             int nTxin = getnTxin(Tx);
-            if (ntxin < 0 || ntxin == nTxin) {//si esta fuera de rango
+            if (ntxin < 0 || ntxin <= nTxin) {//si esta fuera de rango
                 return;
             }
             else {
@@ -411,19 +411,19 @@ void blockchain::setsignature(int block, int tx, int ntxin, string signature) {
 }
 //  set amount
 void blockchain::setamount(int block, int tx, int ntxout, int amount) {
-    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+    if (block < 0 || block <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
         nlohmann::json bloque = getblock(block);
         int nTx = getnTx(bloque);
-        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+        if (tx < 0 || tx <= nTx) {//si esta fuera de rango
             return;
         }
         else {
             nlohmann::json Tx = gettx(bloque, tx);
             int nTxout = getnTxout(Tx);
-            if (ntxout < 0 || ntxout == nTxout) {//si esta fuera de rango
+            if (ntxout < 0 || ntxout <= nTxout) {//si esta fuera de rango
                 return;
             }
             else {
@@ -435,19 +435,19 @@ void blockchain::setamount(int block, int tx, int ntxout, int amount) {
 
 //  set publicid
 void blockchain::setpublicid(int block, int tx, int ntxout, string publicid) {
-    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+    if (block < 0 || block <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
         nlohmann::json bloque = getblock(block);
         int nTx = getnTx(bloque);
-        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+        if (tx < 0 || tx <= nTx) {//si esta fuera de rango
             return;
         }
         else {
             nlohmann::json Tx = gettx(bloque, tx);
             int nTxout = getnTxout(Tx);
-            if (ntxout < 0 || ntxout == nTxout) {//si esta fuera de rango
+            if (ntxout < 0 || ntxout <= nTxout) {//si esta fuera de rango
                 return;
             }
             else {
@@ -458,13 +458,13 @@ void blockchain::setpublicid(int block, int tx, int ntxout, string publicid) {
 }
 //  set vout
 void blockchain::setvout(int block, int tx, int amount, string publicid) {
-    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+    if (block < 0 || block <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
         nlohmann::json bloque = getblock(block);
         int nTx = getnTx(bloque);
-        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+        if (tx < 0 || tx <= nTx) {//si esta fuera de rango
             return;
         }
         else {//creo un nuevo vout e incremento nTxout
@@ -481,13 +481,13 @@ void blockchain::setvout(int block, int tx, int amount, string publicid) {
 }
 //  set vin
 void blockchain::setvin(int block, int tx, string blockid, int out, string signature, string txid) {
-    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+    if (block < 0 || block <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
         nlohmann::json bloque = getblock(block);
         int nTx = getnTx(bloque);
-        if (tx < 0 || tx == nTx) {//si esta fuera de rango
+        if (tx < 0 || tx <= nTx) {//si esta fuera de rango
             return;
         }
         else {//creo un nuevo vout e incremento nTxout
@@ -504,7 +504,7 @@ void blockchain::setvin(int block, int tx, string blockid, int out, string signa
 }
 //set tx
 void blockchain::settx(int block, string txid) {
-    if (block < 0 || block == cantblocks) {//si esta fuera de rango
+    if (block < 0 || block <= cantblocks) {//si esta fuera de rango
         return;
     }
     else {
