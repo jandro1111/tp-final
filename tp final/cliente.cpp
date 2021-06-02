@@ -31,6 +31,9 @@ std::string cliente::nodo(std::string request,int puerto)
     chunk.size = 0;    /* no data at this point */
     CURL* curl;
     CURLcode res;
+    blockchain algo("ejemplo.json");
+
+    request += algo.getblock(0).dump(); ;
     curl = curl_easy_init();
     if (curl) {
         curl_easy_setopt(curl, CURLOPT_PORT, puerto);

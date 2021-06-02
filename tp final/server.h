@@ -9,7 +9,7 @@ public:
 	void start();
 private:
 	void start_waiting_connection();
-	void start_answering(std::string);
+	void start_answering(int);
 	void connection_received_cb(const boost::system::error_code& error);
 	void response_sent_cb(const boost::system::error_code& error, size_t bytes_sent);
 	std::string msg;
@@ -18,6 +18,9 @@ private:
 	boost::asio::ip::tcp::socket socket_;
 	boost::asio::ip::tcp::acceptor acceptor_;
 
-	nlohmann::json j;
+	nlohmann::json block;
+	nlohmann::json tx;
+	nlohmann::json merkleblock;
+	nlohmann::json filster;
 };
 

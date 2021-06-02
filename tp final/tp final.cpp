@@ -12,7 +12,7 @@ using namespace std;
 int main()
 {
 	cliente algo;
-	std::string request[6] = { "blockpost","transactionpost","merkleblockpost","filterpost","getblocks","getblockheader" };
+	std::string request[6] = { "blockpost/","transactionpost/","merkleblockpost/","filterpost/","getblocks","getblockheader" };
 	std::string ip = "127.0.0.1/";
 	ip += request[0];
 		int puerto = SERVERP;

@@ -2,7 +2,7 @@
 
 
 using boost::asio::ip::tcp;
-std::string make_response_string(std::string aux);
+std::string make_response_string(int request);
 
 
 server::server(boost::asio::io_context& io_context)
@@ -44,7 +44,7 @@ void server::start_waiting_connection()
 	);
 }
 
-void server::start_answering(std::string aux)
+void server::start_answering(int aux)
 {
 	std::cout << "start_answering()" << std::endl;
 	msg = make_response_string(aux);
@@ -113,13 +113,14 @@ void server::connection_received_cb(const boost::system::error_code& error)//aca
 			break;
 		}
 	}
+	int option=0;
 	handler.close();
 	//en aux tengo el path a buscar
 
 
 	std::cout << "connection_received_cb()" << std::endl;
 	if (!error) {
-		start_answering(aux);
+		start_answering(option);
 		start_waiting_connection();
 	}
 	else {
@@ -138,14 +139,10 @@ void server::response_sent_cb(const boost::system::error_code& error,
 }
 
 
-std::string make_response_string(std::string aux)//aca armamos el mensaje en aux tengo el path a buscar
+std::string make_response_string(int request)//aca armamos el mensaje en aux tengo el path a buscar
 {
 #pragma warning(disable : 4996)
 	std::string res;
-	std::ifstream info(aux);
-	std::ifstream archivo(aux.c_str());
-	std::string linea;
-	if (info.is_open()) {
 		std::cout << "lo encontre" << std::endl;//200 found
 		res += "HTTP/1.1 200 OK";
 		res += "\r\n";
@@ -160,14 +157,8 @@ std::string make_response_string(std::string aux)//aca armamos el mensaje en aux
 		res += "Content-Type : text / html; charset = iso - 8859 - 1";
 		res += "\r\n";
 		res += "\r\n";
-		while (getline(archivo, linea)) {
-			// Lo vamos imprimiendo
-			res += linea;
-		}
-		res += "\r\n";
-		res += "\r\n";
-	}
-	else {
+
+	
 		std::cout << "no lo encontre" << std::endl;//404 not found
 		res += "HTTP/1.1 404 Not Found";
 		res += "\r\n";
@@ -181,12 +172,9 @@ std::string make_response_string(std::string aux)//aca armamos el mensaje en aux
 		res += "\r\n";
 		res += "Content - Type : text / html; charset = iso - 8859 - 1";
 		res += "\r\n";//404
-	}
 
 
 
-	std::cout << aux << std::endl;
-	using namespace std; // For time_t, time and ctime;
-	time_t now = time(0);
+
 	return res;
 }
