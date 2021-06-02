@@ -142,20 +142,30 @@ void server::response_sent_cb(const boost::system::error_code& error,
 std::string make_response_string(int request)//aca armamos el mensaje en aux tengo el path a buscar
 {
 #pragma warning(disable : 4996)
+	std::string aux ="";
+	int header = 0;//sacar cuando tenga blockheader
+	int cant = 2;//sacar cuando tenga parser
+	blockchain algo("ejemplo.json");
 	std::string res;
-		std::cout << "lo encontre" << std::endl;//200 found
-		res += "HTTP/1.1 200 OK";
-		res += "\r\n";
-		res += "Date: Date(Ej : Tue, 04 Sep 2018 18 : 21 : 19 GMT)";
-		res += "\r\n";
-		res += "Cache-Control : public, max - age = 30";
-		res += "\r\n";
-		res += "Expires:Date + 30s(Ej : Tue, 04 Sep 2018 18 : 21 : 49 GMT)";
-		res += "\r\n";
-		res += "Content-Length : 1";
-		res += "\r\n";
-		res += "Content-Type : text / html; charset = iso - 8859 - 1";
-		res += "\r\n";
-		res += "\r\n";
-		return res;
+	res += "HTTP/1.1 200 OK";
+	res += "\r\n";
+	res += "Content-Length : ";
+	switch (request) {
+	case 0:
+		aux = str(boost::format("{\"status\": true,\"result\":%1%}")%algo.getblocks(cant));
+		break;
+	case 1:
+		aux = str(boost::format("{\"status\": true,\"result\":%1%}")%header);
+		break;
+	default:
+		aux = "{\"status\": true,\"result\":null}";
+		break;
+	}
+	res += std::to_string(aux.size());
+	res += "\r\n";
+	res += "Content-Type : text / html; charset = iso - 8859 - 1";
+	res += "\r\n";
+	res += aux;
+	return res;
 }
+

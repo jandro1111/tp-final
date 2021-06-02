@@ -48,6 +48,7 @@ public:
 	std::string calculatemerkleroot(int);//recibe el numero del bloque del cual va a querer calcular el merkleroot, devuelve null si es un numero de bloque no valido
 	std::vector<std::string> calculatemerkletree(int);
 	void calculatecantblocks(void); //calcula cuantos bloques hay en la blockchain
+	std::string getblocks(int cant);//la cantidad de bloques a gettear
 private:
 	nlohmann::json j;// el blockchain
 	int cantblocks;

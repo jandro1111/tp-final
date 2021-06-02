@@ -526,3 +526,18 @@ void blockchain::setblock(std::string blockid,  std::string merkleroot, int nonc
     j[cantblocks] = aux1;//apunta al nuevo elemento del arreglo
     cantblocks++;
 }
+//
+std::string blockchain::getblocks(int cant) {
+    std::string aux = "";
+    if (cant > cantblocks) {//si pediste una cantidad de bloques mas grande de la q tengo
+        for (int i = 0; i < cantblocks; ++i) {
+            aux += getblock(i).dump();
+        }
+    }
+    else {
+        for (int i = 0; i < cant; ++i) {
+            aux += getblock(i).dump();
+        }
+    }
+    return aux;
+}
