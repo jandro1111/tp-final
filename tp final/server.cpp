@@ -157,24 +157,5 @@ std::string make_response_string(int request)//aca armamos el mensaje en aux ten
 		res += "Content-Type : text / html; charset = iso - 8859 - 1";
 		res += "\r\n";
 		res += "\r\n";
-
-	
-		std::cout << "no lo encontre" << std::endl;//404 not found
-		res += "HTTP/1.1 404 Not Found";
-		res += "\r\n";
-		res += "Date: Date(Ej : Tue, 04 Sep 2018 18 : 21 : 19 GMT)";
-		res += "\r\n";
-		res += "Cache - Control : public, max - age = 30";
-		res += "\r\n";
-		res += "Expires : Date + 30s(Ej : Tue, 04 Sep 2018 18 : 21 : 49 GMT)";
-		res += "\r\n";
-		res += "Content - Length : 0";
-		res += "\r\n";
-		res += "Content - Type : text / html; charset = iso - 8859 - 1";
-		res += "\r\n";//404
-
-
-
-
-	return res;
+		return res;
 }

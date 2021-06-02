@@ -11,10 +11,11 @@ using namespace std;
 
 int main()
 {
+	int option = 3;//el tipo de request que voy a hacer
 	cliente algo;
 	std::string request[6] = { "blockpost/","transactionpost/","merkleblockpost/","filterpost/","getblocks","getblockheader" };
 	std::string ip = "127.0.0.1/";
-	ip += request[0];
+	ip += request[option];
 		int puerto = SERVERP;
 		//boost::asio::io_context io_context;//
 		//server sv(io_context);//
@@ -22,7 +23,7 @@ int main()
 	std::cin >> nodeuse;
 	switch (nodeuse) {
 	case 1://cliente
-		algo.nodo(ip,puerto);
+		algo.nodo(ip,puerto,option);
 		break;
 	//case 2://servidor comentar si se esta probando con el servidor de hercules
 	//	try
