@@ -12,7 +12,7 @@ static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, voi
 class cliente
 {
 public:
-    std::string nodo(std::string request);//recive la request q hace y devuelve un string con lo que recivio
+    std::string nodo(std::string request,int puerto);//recive la request q hace el puerto y devuelve un string con lo que recivio
 
 private:
     nlohmann::json j;//aca guardo la response

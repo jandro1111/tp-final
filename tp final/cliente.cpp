@@ -24,7 +24,7 @@ static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, voi
 
 
 //
-std::string cliente::nodo(std::string request)
+std::string cliente::nodo(std::string request,int puerto)
 {
     struct MemoryStruct chunk;
     chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
@@ -33,7 +33,7 @@ std::string cliente::nodo(std::string request)
     CURLcode res;
     curl = curl_easy_init();
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_PORT, SERVERP);
+        curl_easy_setopt(curl, CURLOPT_PORT, puerto);
         /* example.com is redirected, so we tell libcurl to follow redirection */
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         curl_easy_setopt(curl, CURLOPT_URL, request.c_str());
@@ -91,4 +91,4 @@ Content-Type: json; charset=iso-8859-1
 
 
 *///respuesta de prueba
-  
+ 

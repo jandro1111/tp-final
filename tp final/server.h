@@ -17,5 +17,7 @@ private:
 	boost::asio::io_context& context_;
 	boost::asio::ip::tcp::socket socket_;
 	boost::asio::ip::tcp::acceptor acceptor_;
+
+	nlohmann::json j;
 };
 

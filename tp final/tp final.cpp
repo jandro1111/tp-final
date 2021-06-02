@@ -12,25 +12,29 @@ using namespace std;
 int main()
 {
 	cliente algo;
-		boost::asio::io_context io_context;//
-		server sv(io_context);//
+	std::string request[6] = { "blockpost","transactionpost","merkleblockpost","filterpost","getblocks","getblockheader" };
+	std::string ip = "127.0.0.1/";
+	ip += request[0];
+		int puerto = SERVERP;
+		//boost::asio::io_context io_context;//
+		//server sv(io_context);//
 	int nodeuse;
 	std::cin >> nodeuse;
 	switch (nodeuse) {
 	case 1://cliente
-		algo.nodo("127.0.0.1/getblock");
+		algo.nodo(ip,puerto);
 		break;
-	case 2://servidor comentar si se esta probando con el servidor de hercules
-		try
-		{
-			sv.start();
-			io_context.run();
-		}
-		catch (std::exception& e)
-		{
-			std::cerr << e.what() << std::endl;
-		}
-		break;
+	//case 2://servidor comentar si se esta probando con el servidor de hercules
+	//	try
+	//	{
+	//		sv.start();
+	//		io_context.run();
+	//	}
+	//	catch (std::exception& e)
+	//	{
+	//		std::cerr << e.what() << std::endl;
+	//	}
+	//	break;
 	default:
 		break;
 

@@ -7,7 +7,7 @@ std::string make_response_string(std::string aux);
 
 server::server(boost::asio::io_context& io_context)
 	: context_(io_context),
-	acceptor_(io_context, tcp::endpoint(tcp::v4(), 80)),//ese de ahi es el numero del puerto
+	acceptor_(io_context, tcp::endpoint(tcp::v4(), CLIENTEP)),//ese de ahi es el numero del puerto
 	socket_(io_context)
 {
 }
