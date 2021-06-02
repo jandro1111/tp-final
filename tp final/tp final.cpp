@@ -5,14 +5,42 @@
 #include"blockchain.h"
 #include "Gui.h"
 #include "files.h"
-
+#include "cliente.h"
+#include"server.h"
 using namespace std;
 
 int main()
 {
+	cliente algo;
+		boost::asio::io_context io_context;//
+		server sv(io_context);//
+	int nodeuse;
+	std::cin >> nodeuse;
+	switch (nodeuse) {
+	case 1://cliente
+		algo.nodo("127.0.0.1/getblock");
+		break;
+	case 2://servidor comentar si se esta probando con el servidor de hercules
+		try
+		{
+			sv.start();
+			io_context.run();
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << e.what() << std::endl;
+		}
+		break;
+	default:
+		break;
+
+	}
+	
+
+
+	/*
 	bool running = true;
 	Gui myGui;
-
 	myGui.initGUI();
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
 	if (!queue)
@@ -115,4 +143,5 @@ int main()
 	myGui.destroyAllegro();
 
 	return 0;
+	*/
 }

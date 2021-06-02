@@ -11,6 +11,12 @@
 #include<sstream>
 #include<boost/format.hpp>
 #include<iomanip>
+#include <boost/array.hpp>
+#include <boost/asio.hpp>
+#include<curl/curl.h>
+#include <boost\bind.hpp>
 //	DEFINES	//
 const nlohmann::json nulljson ;//supongamos que es un define
+#define SERVERP 80
+#define CLIENTEP 81
 //	STRUCT	//

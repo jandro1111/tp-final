@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="blockchain.cpp" />
+    <ClCompile Include="cliente.cpp" />
     <ClCompile Include="files.cpp" />
     <ClCompile Include="Gui.cpp" />
     <ClCompile Include="lib\imgui.cpp" />
@@ -150,10 +151,12 @@
     <ClCompile Include="lib\imgui_impl_allegro5.cpp" />
     <ClCompile Include="lib\imgui_tables.cpp" />
     <ClCompile Include="lib\imgui_widgets.cpp" />
+    <ClCompile Include="server.cpp" />
     <ClCompile Include="tp final.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="blockchain.h" />
+    <ClInclude Include="cliente.h" />
     <ClInclude Include="files.h" />
     <ClInclude Include="Gui.h" />
     <ClInclude Include="Header.h" />
@@ -165,6 +168,7 @@
     <ClInclude Include="lib\imstb_rectpack.h" />
     <ClInclude Include="lib\imstb_textedit.h" />
     <ClInclude Include="lib\imstb_truetype.h" />
+    <ClInclude Include="server.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ejemplo.json" />
