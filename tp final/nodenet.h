@@ -4,7 +4,7 @@
 #include "server.h"
 #include "blockchain.h"
 struct nodo {
-	server Server;
+	//server Server;//arreglar constructor por defecto
 	cliente client;
 	bool nodofull;
 	std::list <std::string> options ;
