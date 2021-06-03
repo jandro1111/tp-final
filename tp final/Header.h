@@ -20,4 +20,6 @@ const nlohmann::json nulljson ;//supongamos que es un define
 #define SERVERP 81
 #define CLIENTEP 80
 #define PUERTOINI 80
+#define BLOCK_ID_LENGTH 8
+enum REQUESTTYPE { INVALID_REQUEST = 0, SEND_BLOCK, SEND_TX, SEND_MERKLE_ROOT, SEND_FILTER, GET_BLOCKS, GET_BLOCK_HEADER };
 //	STRUCT	//

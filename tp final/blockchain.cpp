@@ -552,3 +552,19 @@ int blockchain::searchid(std::string id) {
         return i ;
     }
 }
+//
+std::string blockchain::getheader(int cant, int indi) {
+    std::string aux = "";
+    for (int i = indi; i < cantblocks && cant>0; ++i, cant--) {
+        aux += makeheader(i).dump();
+    }
+    return aux;
+}
+//
+nlohmann::json blockchain::makeheader(int i) {
+    nlohmann::json header;
+    std::string aux;
+    aux = str(boost::format("{ \"blockid\": \"%1%\",\"height\" : %2%,\"merkleroot\" : \"%3%\",\"nTx\" : %4%,\"nonce\" : %5%,\"previousblockid\" : \"%6%\" }") % getblockid(getblock(i)) % getheight(getblock(i)) % getmerkleroot(getblock(i)) % getnTx(getblock(i)) % getnonce(getblock(i)) % getpreviousblockid(getblock(i))  );
+    header = nlohmann::json::parse(aux);
+    return header;
+}

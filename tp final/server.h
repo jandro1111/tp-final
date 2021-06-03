@@ -9,9 +9,10 @@ public:
 	void start();
 private:
 	void start_waiting_connection();
-	void start_answering(int);
+	void start_answering(int,std::string,int);
 	void connection_received_cb(const boost::system::error_code& error);
 	void response_sent_cb(const boost::system::error_code& error, size_t bytes_sent);
+	int parse_request(std::string request,int& cant,std::string& id);
 	std::string msg;
 
 	boost::asio::io_context& context_;

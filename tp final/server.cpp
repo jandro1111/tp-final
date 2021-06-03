@@ -2,7 +2,7 @@
 
 
 using boost::asio::ip::tcp;
-std::string make_response_string(int request);
+std::string make_response_string(int request,std::string id,int cant);
 
 
 server::server(boost::asio::io_context& io_context,int port)
@@ -44,10 +44,10 @@ void server::start_waiting_connection()
 	);
 }
 
-void server::start_answering(int aux)
+void server::start_answering(int aux,std::string id,int cant)
 {
 	std::cout << "start_answering()" << std::endl;
-	msg = make_response_string(aux);
+	msg = make_response_string(aux, id,cant);
 	boost::asio::async_write(//make_daytime_string()
 		socket_,
 		boost::asio::buffer(msg),
@@ -69,7 +69,7 @@ void server::connection_received_cb(const boost::system::error_code& error)//aca
 	handler.open("handler.txt", std::ios::trunc);//borro lo que habia antes
 	for (;;)//recibo lo del cliente y lo interpreto
 	{
-		boost::array<char, 128> buf;
+		boost::array<char,128> buf;
 		boost::system::error_code error;
 
 		size_t len = socket_.read_some(boost::asio::buffer(buf), error);
@@ -91,36 +91,20 @@ void server::connection_received_cb(const boost::system::error_code& error)//aca
 	string aux = "";
 	// Obtener línea de archivo, y almacenar contenido en "linea"
 	while (getline(archivo, linea)) {
-		// Lo vamos imprimiendo
-		bool fin = false;
-		bool ini = false;
-		for (int i = 0; fin == false; ++i) {//aislo el archivo a buscar
-			if (linea[i] == '/' || ini == true) {//encontre el inicio
-				if (ini == false) {
-				}
-				else {
-					aux += linea[i];
-				}
-				ini = true;
-			}
-			if (ini == true) {
-				if (linea[i] == ' ') {//encontre el final
-					fin = true;
-				}
-			}
-		}
-		if (fin == true) {
-			break;
-		}
+					aux += linea;
 	}
-	int option=0;
+	int cant = 2;
+	std::string id = "534F219B";
+	std::cout << aux << std::endl;
+	int option=parse_request(aux,cant,id);
+	
 	handler.close();
 	//en aux tengo el path a buscar
 
 
 	std::cout << "connection_received_cb()" << std::endl;
 	if (!error) {
-		start_answering(option);
+		start_answering(option,id,cant);
 		start_waiting_connection();
 	}
 	else {
@@ -139,20 +123,18 @@ void server::response_sent_cb(const boost::system::error_code& error,
 }
 
 
-std::string make_response_string(int request)//aca armamos el mensaje en aux tengo el path a buscar
+std::string make_response_string(int request,std::string id,int cant)//aca armamos el mensaje en aux tengo el path a buscar
 {
 #pragma warning(disable : 4996)
-	std::string id = "534F219B";
 	std::string aux ="";
 	int header = 0;//sacar cuando tenga blockheader
-	int cant = 2;//sacar cuando tenga parser
 	blockchain algo("ejemplo.json");
 	std::string res;
 	res += "HTTP/1.1 200 OK";
 	res += "\r\n";
 	res += "Content-Length : ";
 	switch (request) {
-	case 0:
+	case 5:
 		if (algo.searchid(id) < 0) {
 			aux = "{\"status\": false,\"result\":1}";
 		}
@@ -163,8 +145,16 @@ std::string make_response_string(int request)//aca armamos el mensaje en aux ten
 			aux = str(boost::format("{\"status\": true,\"result\":%1%}") % algo.getblocks(cant,algo.searchid(id)));
 		}
 		break;
-	case 1:
-		aux = str(boost::format("{\"status\": true,\"result\":%1%}")%header);
+	case 6:
+		if (algo.searchid(id) < 0) {
+			aux = "{\"status\": false,\"result\":1}";
+		}
+		else {
+			if (id == "00000000") {
+				cant = algo.getcantblock();
+			}
+			aux = str(boost::format("{\"status\": true,\"result\":%1%}") % algo.getheader(cant,algo.searchid(id)));
+		}
 		break;
 	default:
 		aux = "{\"status\": true,\"result\":null}";
@@ -177,4 +167,59 @@ std::string make_response_string(int request)//aca armamos el mensaje en aux ten
 	res += aux;
 	return res;
 }
+int server::parse_request(std::string request, int& cant, std::string& id) {
+	size_t offset;
+	if ((offset = request.find("send_block")) != std::string::npos) { //Si encuentro el pedido recorto tal que solo quede el json de "request", y lo guardo.
+		request = request.substr((offset + strlen("send_block/")));
+		request = request.substr(0, (int)request.find("HTTP"));
+		std::cout << std::endl<<request << std::endl;
+		block = nlohmann::json::parse(request);
+		return SEND_BLOCK;
+	}
+	else if ((offset = request.find("send_tx")) != std::string::npos) {
+		request = request.substr(offset + strlen("send_tx/"));
+		request = request.substr(0, (int)request.find("HTTP"));
+		tx = nlohmann::json::parse(request);
+		return SEND_TX;
+	}
+	else if ((offset = request.find("send_merkle_block")) != std::string::npos) {
+		request = request.substr(offset + strlen("send_merkle_block/"));
+		request = request.substr(0, (int)request.find("HTTP"));
+		merkleblock = nlohmann::json::parse(request);
+		return SEND_MERKLE_ROOT;
+	}
+	else if ((offset = request.find("send_filter")) != std::string::npos) {
+		request = request.substr(offset + strlen("send_filter/"));
+		request = request.substr(0, (int)request.find("HTTP"));
+		filster = nlohmann::json::parse(request);
+		return SEND_FILTER;
+	}
+	else if ((offset = request.find("get_blocks")) != std::string::npos) {
+		std::string auxiliaryStr;
+		offset += strlen("get_blocks?block_id=");//getblocks?block_id=00000000&count=2
+		auxiliaryStr = request.substr(offset);
+		auxiliaryStr = request.substr(0, BLOCK_ID_LENGTH);
+		id = auxiliaryStr;
 
+		auxiliaryStr = request.substr(offset + BLOCK_ID_LENGTH + strlen("&count="));
+		cant = std::atoi(auxiliaryStr.c_str());
+		
+		return GET_BLOCKS;
+	}
+	else if ((offset = request.find("get_block_header")) != std::string::npos) {
+		std::string auxiliaryStr;
+		offset += strlen("get_block_header?block_id=");
+		auxiliaryStr = request.substr(offset);
+		auxiliaryStr = request.substr(0, BLOCK_ID_LENGTH);
+		id = auxiliaryStr;
+		
+		auxiliaryStr = request.substr(offset + BLOCK_ID_LENGTH + strlen("&count="));
+		cant = std::atoi(auxiliaryStr.c_str());
+
+		return GET_BLOCK_HEADER;
+	}
+	else {
+		std::cerr << "Header request not valid!" << std::endl;
+		return INVALID_REQUEST;
+	}
+}

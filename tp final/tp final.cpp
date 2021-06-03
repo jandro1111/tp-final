@@ -11,32 +11,34 @@ using namespace std;
 
 int main()
 {
-	int option = 3;//el tipo de request que voy a hacer
+	int option = 0;//el tipo de request que voy a hacer
 	cliente algo;
-	std::string request[6] = { "blockpost/","transactionpost/","merkleblockpost/","filterpost/","getblocks","getblockheader" };
+	std::string request[6] = { "send_block/","send_tx/","send_merkle_block/","send_filter/","get_blocks","get_block_header" };
 	std::string ip = "127.0.0.1/";
+	std::string id = "534F219B";
+	int cant = 2;
 	ip += request[option];
 		int puerto = SERVERP;
 		int puertoc = CLIENTEP;
-		boost::asio::io_context io_context;//
-		server sv(io_context,puertoc);//
+		//boost::asio::io_context io_context;//
+		//server sv(io_context,puertoc);//
 	int nodeuse;
 	std::cin >> nodeuse;
 	switch (nodeuse) {
 	case 1://cliente
-		algo.client(ip,puerto,option);
+		algo.client(ip,puerto,option,cant,id);
 		break;
-	case 2://servidor comentar si se esta probando con el servidor de hercules
-		try
-		{
-			sv.start();
-			io_context.run();
-		}
-		catch (std::exception& e)
-		{
-			std::cerr << e.what() << std::endl;
-		}
-		break;
+	//case 2://servidor comentar si se esta probando con el servidor de hercules
+	//	try
+	//	{
+	//		sv.start();
+	//		io_context.run();
+	//	}
+	//	catch (std::exception& e)
+	//	{
+	//		std::cerr << e.what() << std::endl;
+	//	}
+	//	break;
 	default:
 		break;
 

@@ -24,7 +24,7 @@ static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, voi
 
 
 //
-std::string cliente::client(std::string request,int puerto,int option)
+std::string cliente::client(std::string request,int puerto,int option,int cant,std::string id)
 {
     struct MemoryStruct chunk;
     chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
@@ -39,11 +39,23 @@ std::string cliente::client(std::string request,int puerto,int option)
         case 1:
             request += algo.gettx(algo.getblock(0), 0).dump();
             break;
-        case 2:
+        case 2://falta hacer
             break;
          case 3:
              request+="{\"Key\" : \"pubkey1\"}";
             break;
+         case 4:
+             request += "?block_id=";
+             request += id;
+             request += "&count=";
+             request += std::to_string(cant);
+             break;
+         case 5:
+             request += "?block_id=";
+             request += id;
+             request += "&count=";
+             request += std::to_string(cant);
+             break;
          default:
             break;
     }
@@ -52,6 +64,21 @@ std::string cliente::client(std::string request,int puerto,int option)
     if (curl) {
         curl_easy_setopt(curl, CURLOPT_PORT, puerto);
         /* example.com is redirected, so we tell libcurl to follow redirection */
+        switch (option) {
+        case 0:
+        case 1:
+        case 2://falta hacer
+        case 3:
+            curl_easy_setopt(curl, CURLOPT_POST, 1L);
+            break;
+        case 4:
+        case 5:
+            curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L);
+            break;
+        default:
+            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+            break;
+        }
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         curl_easy_setopt(curl, CURLOPT_URL, request.c_str());
         curl_easy_setopt(curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTP);

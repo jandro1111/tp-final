@@ -50,6 +50,8 @@ public:
 	void calculatecantblocks(void); //calcula cuantos bloques hay en la blockchain
 	std::string getblocks(int cant,int in);//la cantidad de bloques a gettear y a partir de que bloque buscar
 	int searchid(std::string id);//busca en q numero de bloque esta ese id, devuelve -1 si el bloque no existe
+	std::string getheader(int cant, int indi);//busca el numero de ids a partir de ese id
+	nlohmann::json makeheader(int i);//recive el indice del bloque del cual hay q armar el header
 private:
 	nlohmann::json j;// el blockchain
 	int cantblocks;
