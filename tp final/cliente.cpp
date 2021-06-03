@@ -24,7 +24,7 @@ static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, voi
 
 
 //
-std::string cliente::nodo(std::string request,int puerto,int option)
+std::string cliente::client(std::string request,int puerto,int option)
 {
     struct MemoryStruct chunk;
     chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */

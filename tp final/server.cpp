@@ -5,9 +5,9 @@ using boost::asio::ip::tcp;
 std::string make_response_string(int request);
 
 
-server::server(boost::asio::io_context& io_context)
+server::server(boost::asio::io_context& io_context,int port)
 	: context_(io_context),
-	acceptor_(io_context, tcp::endpoint(tcp::v4(), CLIENTEP)),//ese de ahi es el numero del puerto
+	acceptor_(io_context, tcp::endpoint(tcp::v4(), port)),//ese de ahi es el numero del puerto
 	socket_(io_context)
 {
 }
@@ -142,6 +142,7 @@ void server::response_sent_cb(const boost::system::error_code& error,
 std::string make_response_string(int request)//aca armamos el mensaje en aux tengo el path a buscar
 {
 #pragma warning(disable : 4996)
+	std::string id = "534F219B";
 	std::string aux ="";
 	int header = 0;//sacar cuando tenga blockheader
 	int cant = 2;//sacar cuando tenga parser
@@ -152,7 +153,15 @@ std::string make_response_string(int request)//aca armamos el mensaje en aux ten
 	res += "Content-Length : ";
 	switch (request) {
 	case 0:
-		aux = str(boost::format("{\"status\": true,\"result\":%1%}")%algo.getblocks(cant));
+		if (algo.searchid(id) < 0) {
+			aux = "{\"status\": false,\"result\":1}";
+		}
+		else {
+			if (id == "00000000") {
+				cant=algo.getcantblock();
+			}
+			aux = str(boost::format("{\"status\": true,\"result\":%1%}") % algo.getblocks(cant,algo.searchid(id)));
+		}
 		break;
 	case 1:
 		aux = str(boost::format("{\"status\": true,\"result\":%1%}")%header);

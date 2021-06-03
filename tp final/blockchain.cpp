@@ -527,17 +527,28 @@ void blockchain::setblock(std::string blockid,  std::string merkleroot, int nonc
     cantblocks++;
 }
 //
-std::string blockchain::getblocks(int cant) {
+std::string blockchain::getblocks(int cant,int indi) {
     std::string aux = "";
-    if (cant > cantblocks) {//si pediste una cantidad de bloques mas grande de la q tengo
-        for (int i = 0; i < cantblocks; ++i) {
-            aux += getblock(i).dump();
-        }
-    }
-    else {
-        for (int i = 0; i < cant; ++i) {
-            aux += getblock(i).dump();
-        }
+    for (int i = indi; i < cantblocks&&cant>0; ++i,cant--) {
+        aux += getblock(i).dump();
     }
     return aux;
+}
+//
+int blockchain::searchid(std::string id) {
+    int i;
+    if (id == "00000000") {
+        return 0;
+    }
+    for ( i = 0; i < cantblocks; ++i) {
+        if (id == getblockid(getblock(i))){
+            break;
+        }
+    }
+    if (i == cantblocks) {//si sali del for pq me quede sin bloques para buscar
+        return -1;
+    }
+    else {//si sali del for pq encontre el id que buscaba
+        return i ;
+    }
 }

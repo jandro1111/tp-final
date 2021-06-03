@@ -151,6 +151,7 @@
     <ClCompile Include="lib\imgui_impl_allegro5.cpp" />
     <ClCompile Include="lib\imgui_tables.cpp" />
     <ClCompile Include="lib\imgui_widgets.cpp" />
+    <ClCompile Include="nodenet.cpp" />
     <ClCompile Include="server.cpp" />
     <ClCompile Include="tp final.cpp" />
   </ItemGroup>
@@ -168,6 +169,7 @@
     <ClInclude Include="lib\imstb_rectpack.h" />
     <ClInclude Include="lib\imstb_textedit.h" />
     <ClInclude Include="lib\imstb_truetype.h" />
+    <ClInclude Include="nodenet.h" />
     <ClInclude Include="server.h" />
   </ItemGroup>
   <ItemGroup>

@@ -17,13 +17,14 @@ int main()
 	std::string ip = "127.0.0.1/";
 	ip += request[option];
 		int puerto = SERVERP;
+		int puertoc = CLIENTEP;
 		boost::asio::io_context io_context;//
-		server sv(io_context);//
+		server sv(io_context,puertoc);//
 	int nodeuse;
 	std::cin >> nodeuse;
 	switch (nodeuse) {
 	case 1://cliente
-		algo.nodo(ip,puerto,option);
+		algo.client(ip,puerto,option);
 		break;
 	case 2://servidor comentar si se esta probando con el servidor de hercules
 		try

@@ -4,7 +4,7 @@
 class server
 {
 public:
-	server(boost::asio::io_context& context);
+	server(boost::asio::io_context& context,int port);
 	~server();
 	void start();
 private:
