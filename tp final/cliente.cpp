@@ -24,7 +24,7 @@ static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, voi
 
 
 //
-std::string cliente::client(std::string request,int puerto,int option,int cant,std::string id)
+std::string cliente::client(std::string request,int puerto,int option,int cant,std::string id, const char* data)
 {
     struct MemoryStruct chunk;
     chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
@@ -33,17 +33,6 @@ std::string cliente::client(std::string request,int puerto,int option,int cant,s
     CURLcode res;
     blockchain algo("ejemplo.json");
     switch (option) {
-        case 0:
-            request += algo.getblock(0).dump();
-            break;
-        case 1:
-            request += algo.gettx(algo.getblock(0), 0).dump();
-            break;
-        case 2://falta hacer
-            break;
-         case 3:
-             request+="{\"Key\" : \"pubkey1\"}";
-            break;
          case 4:
              request += "?block_id=";
              request += id;
@@ -70,6 +59,8 @@ std::string cliente::client(std::string request,int puerto,int option,int cant,s
         case 2://falta hacer
         case 3:
             curl_easy_setopt(curl, CURLOPT_POST, 1L);
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(data));
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
             break;
         case 4:
         case 5:
