@@ -12,29 +12,13 @@ using namespace std;
 int main()
 {
 	blockchain algo2("ejemplo.json");
-	int option = 3;//el tipo de request que voy a hacer
+	int option = 0;//el tipo de request que voy a hacer
 	cliente algo;
 	std::string request[6] = { "send_block/","send_tx/","send_merkle_block/","send_filter/","get_blocks","get_block_header" };
-	std::string ip = "127.0.0.1/";
 	std::string id = "534F219B";
 	std::string data = "";
-	switch (option) {
-	case 0:
-		 data = algo2.getblock(0).dump();
-		break;
-	case 1:
-		data += algo2.gettx(algo2.getblock(0), 0).dump();
-		break;
-	case 2://falta hacer merkle
-		break;
-	case 3:
-		data+="{\"Key\" : \"pubkey1\"}";
-		break;
-	default:
-		break;
-	}
 	int cant = 2;
-	ip += request[option];
+	std::string ip = "127.0.0.1/";
 		int puerto = SERVERP;
 		int puertoc = CLIENTEP;
 		boost::asio::io_context io_context;//
@@ -43,7 +27,29 @@ int main()
 	std::cin >> nodeuse;
 	switch (nodeuse) {
 	case 1://cliente
-		algo.client(ip,puerto,option,cant,id,data.c_str());
+		for (int i = 0; i < 6; ++i) {
+			switch (i) {//despues sacar afuera y cambiar i x option
+			case 0:
+				data = algo2.getblock(0).dump();
+				break;
+			case 1:
+				data += algo2.gettx(algo2.getblock(0), 0).dump();
+				break;
+			case 2://falta hacer merkle
+				break;
+			case 3:
+				data += "{\"Key\" : \"pubkey1\"}";
+				break;
+			default:
+				break;
+			}
+			ip += request[i];//cambiar i x option
+			algo.client(ip, puerto, i, cant, id, data.c_str());//despues cambiar i por option
+			std::cout << "put any number to continue test" << std::endl;
+			cin >> nodeuse;
+			ip = "127.0.0.1/";
+			data = "";
+		}
 		break;
 	case 2://servidor comentar si se esta probando con el servidor de hercules
 		try

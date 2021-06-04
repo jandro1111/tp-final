@@ -555,7 +555,7 @@ int blockchain::searchid(std::string id) {
 //
 std::string blockchain::getheader(int cant, int indi) {
     std::string aux = "";
-    for (int i = indi; i < cantblocks && cant>0; ++i, cant--) {
+    for (int i = indi+1; i < cantblocks && cant>0; ++i, cant--) {
         aux += makeheader(i).dump();
     }
     return aux;
