@@ -1,5 +1,5 @@
-POST /send_block/ HTTP/1.1
+POST /send_filter/ HTTP/1.1
 Host: 127.0.0.1:81
 Accept: */*
-Content-Length: 1710
-Content-Type: application/x-www-form-urlencod
+Content-Length: 19
+Content-Type: application/x-www-form-urlencode

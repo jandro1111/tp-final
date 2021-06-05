@@ -12,12 +12,20 @@ using namespace std;
 int main()
 {
 	blockchain algo2("ejemplo.json");
+
+
+
+	
 	int option = 0;//el tipo de request que voy a hacer
 	cliente algo;
 	std::string request[6] = { "send_block/","send_tx/","send_merkle_block/","send_filter/","get_blocks","get_block_header" };
 	std::string id = "534F219B";
+	std::string publicid = "8745926946298734";
+	int amount = 2;
 	std::string data = "";
 	int cant = 2;
+	int bloque = 0;
+	int tx = 0;
 	std::string ip = "127.0.0.1/";
 		int puerto = SERVERP;
 		int puertoc = CLIENTEP;
@@ -30,12 +38,13 @@ int main()
 		for (int i = 0; i < 6; ++i) {
 			switch (i) {//despues sacar afuera y cambiar i x option
 			case 0:
-				data = algo2.getblock(0).dump();
+				data = algo2.getblock(bloque).dump();
 				break;
 			case 1:
-				data += algo2.gettx(algo2.getblock(0), 0).dump();
+				data += algo2.sendtx(amount,publicid);
 				break;
-			case 2://falta hacer merkle
+			case 2:
+			data+=algo2.makemerkleblock(bloque,tx);
 				break;
 			case 3:
 				data += "{\"Key\" : \"pubkey1\"}";
@@ -66,7 +75,6 @@ int main()
 		break;
 
 	}
-	
 
 
 	/*

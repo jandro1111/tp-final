@@ -174,8 +174,8 @@ int blockchain::getoutputIndex(nlohmann::json vin)
 }
 
 
-//  calcula el merkle root
-std::vector<std::string> blockchain::calculatemerkletree(int num)
+//  calcula el merkle tree
+vector<vector<string>> blockchain::calculatemerkletree(int num)
 {
     int itx = 0;
     int itxin = 0;
@@ -183,7 +183,7 @@ std::vector<std::string> blockchain::calculatemerkletree(int num)
 
     vector<string> temp;
     vector<string> temp2;
-    vector<string> fullMerkleTree; //Contiene todo el merkle tree, empezando por hojas y terminando por el root
+    vector<vector<string>> fullMerkleTree; //Contiene todo el merkle tree, empezando por hojas y terminando por el root
 
     list<string> hojas;
     nlohmann::json bloque, tx, vin;
@@ -214,8 +214,8 @@ std::vector<std::string> blockchain::calculatemerkletree(int num)
 
     for (std::list<string>::iterator it = hojas.begin(); it != hojas.end(); ++it) {
         temp.push_back(*it);
-        fullMerkleTree.push_back(*it);
     }
+    fullMerkleTree.push_back(temp);
 
     string newID;
     if (temp.size() == 1) {
@@ -231,10 +231,10 @@ std::vector<std::string> blockchain::calculatemerkletree(int num)
                 newID += *(it + 1);
                 newID = int2hex(generateID(newID.c_str()));
                 temp2.push_back(newID);
-                fullMerkleTree.push_back(newID);
                 it++;
             }
             temp.clear();
+            fullMerkleTree.push_back(temp2);
             if (temp2.size() == 1) {
                 break;
             }
@@ -246,10 +246,10 @@ std::vector<std::string> blockchain::calculatemerkletree(int num)
                 newID += *(it + 1);
                 newID = int2hex(generateID(newID.c_str()));
                 temp.push_back(newID);
-                fullMerkleTree.push_back(newID);
                 it++;
             }
             temp2.clear();
+            fullMerkleTree.push_back(temp);
         }
     }
 
@@ -258,7 +258,7 @@ std::vector<std::string> blockchain::calculatemerkletree(int num)
 
 // Calcula el merkle root
 std::string blockchain::calculatemerkleroot(int num) {
-    return calculatemerkletree(num).back();
+    return calculatemerkletree(num).back().back();
 }
 //  SETTERS
 // set block id
@@ -567,4 +567,55 @@ nlohmann::json blockchain::makeheader(int i) {
     aux = str(boost::format("{ \"blockid\": \"%1%\",\"height\" : %2%,\"merkleroot\" : \"%3%\",\"nTx\" : %4%,\"nonce\" : %5%,\"previousblockid\" : \"%6%\" }") % getblockid(getblock(i)) % getheight(getblock(i)) % getmerkleroot(getblock(i)) % getnTx(getblock(i)) % getnonce(getblock(i)) % getpreviousblockid(getblock(i))  );
     header = nlohmann::json::parse(aux);
     return header;
+}
+//
+std::string blockchain::makemerkleblock(int block,int tx) {
+    std::string aux = "";
+    if (block >= cantblocks) {//si quiero calcular el merklepath de algo q no existe
+        return aux;
+    }
+    if (tx >= getnTx(getblock(block))) {//si quiero calcular el merklepath de algo q no existe
+        return aux;
+    }
+    aux = str(boost::format("{\"blockid\": \"%1%\", \"tx\": %2%,\"txPos\": %3% ,\"merklePath\": [%4%]}") %getblockid(getblock(block)) %gettx(getblock(block),tx) %tx %makemerklepath(block,tx));
+    return aux;
+}
+//
+std::string blockchain::makemerklepath(int block, int tx) {
+    std::string aux = "";
+    list<string> toparse;
+    int canth = getnTx(getblock(block));
+    vector<vector<std::string>>merkletree = calculatemerkletree(block);
+    if (tx % 2 != 0) {//si la tx es impar
+        toparse.push_back(merkletree[0][tx - 1]);
+    }
+    else {
+        toparse.push_back(merkletree[0][tx + 1]);
+    }
+    for (int i = 1; i <(merkletree.capacity()-1);++i) {//itero para el resto de los niveles del arbol salvo en el root
+        int j = merkletree[i].capacity();
+        if ((tx/(2*i)) % 2 != 0) {//si  es impar
+            toparse.push_front(merkletree[i][(tx / (2 * i)) - 1]);
+        }
+        else {
+            toparse.push_back(merkletree[i][(tx / (2 * i)) + 1]);
+        }
+    }
+    int i = 0;
+    for (list<string>::iterator it = toparse.begin(); i < toparse.size();++i,it++) {
+        if (i == toparse.size()) {//si es el ultimo elemento no le pongo la coma
+            aux += str(boost::format("\"id\":\"%1%\"") % *it);
+        }
+        else {
+            aux += str(boost::format("\"id\":\"%1%\",")%*it);
+        }
+    }
+    cout<<aux<<endl;
+    return aux;
+}
+//
+std::string blockchain::sendtx(int amount, std::string publicid) {
+    std::string aux = "";
+    aux = str(boost::format("{\"nTxin\": 0,\"nTxout\" : 1,\"txid\" : \"algo\",\"vin\" : [] ,\"vout\": [{\"amount\":%1%,\"publicid\":\"%2%\"}]}") % amount %publicid);
+    return aux;
 }

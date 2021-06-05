@@ -15,6 +15,7 @@
 #include <boost/asio.hpp>
 #include<curl/curl.h>
 #include <boost\bind.hpp>
+#include <math.h>
 //	DEFINES	//
 const nlohmann::json nulljson ;//supongamos que es un define
 #define SERVERP 81

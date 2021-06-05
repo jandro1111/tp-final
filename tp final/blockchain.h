@@ -46,12 +46,15 @@ public:
 	void setblock(std::string blockid,  std::string merkleroot, int nonce);//setea un nuevo bloque con 0 transacciones
 //otras funciones
 	std::string calculatemerkleroot(int);//recibe el numero del bloque del cual va a querer calcular el merkleroot, devuelve null si es un numero de bloque no valido
-	std::vector<std::string> calculatemerkletree(int);
+	std::vector<std::vector<std::string>> calculatemerkletree(int);
 	void calculatecantblocks(void); //calcula cuantos bloques hay en la blockchain
 	std::string getblocks(int cant,int in);//la cantidad de bloques a gettear y a partir de que bloque buscar
 	int searchid(std::string id);//busca en q numero de bloque esta ese id, devuelve -1 si el bloque no existe
 	std::string getheader(int cant, int indi);//busca el numero de ids a partir de ese id
 	nlohmann::json makeheader(int i);//recive el indice del bloque del cual hay q armar el header
+	std::string makemerkleblock(int block,int tx);//recibe el numero de bloque del cual va a hacer el merkleblock y el numero de transaccion, si no existe devuelve null
+	std::string makemerklepath(int block, int tx);//recibe el numero de bloque del cual va a hacer el merklepath y el numero de transaccion, si no existe devuelve null
+	std::string sendtx(int amount, std::string publicid);//crea una transaccion para mandarla
 private:
 	nlohmann::json j;// el blockchain
 	int cantblocks;
