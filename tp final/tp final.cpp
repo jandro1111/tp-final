@@ -27,8 +27,8 @@ int main()
 	int bloque = 0;
 	int tx = 0;
 	std::string ip = "127.0.0.1/";
-		int puerto = SERVERP;
-		int puertoc = CLIENTEP;
+		int puerto = CLIENTEP;
+		int puertoc = SERVERP;
 		boost::asio::io_context io_context;//
 		server sv(io_context,puertoc);//
 	int nodeuse;
@@ -41,13 +41,13 @@ int main()
 				data = algo2.getblock(bloque).dump();
 				break;
 			case 1:
-				data += algo2.sendtx(amount,publicid);
+				data = algo2.sendtx(amount,publicid);
 				break;
 			case 2:
-			data+=algo2.makemerkleblock(bloque,tx);
+			data=algo2.makemerkleblock(bloque,tx);
 				break;
 			case 3:
-				data += "{\"Key\" : \"pubkey1\"}";
+				data = "{\"Key\" : \"pubkey1\"}";
 				break;
 			default:
 				break;

@@ -69,7 +69,7 @@ void server::connection_received_cb(const boost::system::error_code& error)//aca
 	handler.open("handler.txt", std::ios::trunc);//borro lo que habia antes
 	for (;;)//recibo lo del cliente y lo interpreto
 	{
-		boost::array<char,128> buf;
+		boost::array<char,12800> buf;
 		boost::system::error_code error;
 
 		size_t len = socket_.read_some(boost::asio::buffer(buf), error);
