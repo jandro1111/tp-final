@@ -74,7 +74,6 @@ std::string nodenet::clientconect(int node1, int node2, int option,int cant,std:
 				try
 				{
 					std::string data = "";
-					//nodos[node2].server...
 					switch (nodos[node1].options[option]) {
 					case 0:
 						data = algo2.getblock(bloque).dump();
