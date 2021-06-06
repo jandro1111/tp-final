@@ -20,7 +20,7 @@ class nodenet
 public:
 	void createnode(bool nodofull,int port,std::string ip);//crea un nuevo nodo
 	bool canconect(int node1, int node2);//verifica que estos nodos se puedan conectar
-	std::string clientconect(int node1, int node2, int option, int cant, std::string id,int bloque ,int ntx);//devuelve el mensaje si se pudo conectar, o que no se pudo conectar, el primer nodo es el del cliente el segundo el server
+	std::string clientconect(int node1, int node2, int option, int cant, std::string id,int bloque ,int ntx,int& imgui);//devuelve el mensaje si se pudo conectar, o que no se pudo conectar, el primer nodo es el del cliente el segundo el server
 	//cant y id es tanto para el post de una tx como para el getblocks/blockheader, y data  ntx y bloque es para hacer un post de ese item
 private:
 	std::vector<nodo> nodos;

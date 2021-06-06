@@ -24,7 +24,7 @@ static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, voi
 
 
 //
-std::string cliente::client(std::string request,int puerto,int option,int cant,std::string id, const char* data)
+std::string cliente::client(std::string request,int puerto,int option,int cant,std::string id, const char* data,int& imgui)
 {
     struct MemoryStruct chunk;
     chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
@@ -81,31 +81,41 @@ std::string cliente::client(std::string request,int puerto,int option,int cant,s
         //hasta aca anda bien
 
         /* Perform the request, res will get the return code */
-        res = curl_easy_perform(curl);
-        std::cout << res << std::endl;
-        /* Check for errors */
-        if (res != CURLE_OK) {
-            fprintf(stderr, "curl_easy_perform() failed: %s\n",
-                curl_easy_strerror(res));
-        }
-        else {
-            printf("%lu bytes retrieved\n", (unsigned long)chunk.size);
-        }
-        //aca guardar en algun lado chunk
 
-        std::string aux = "";
-        for (int i = 0; i < chunk.size; i++) {
-            aux += *(chunk.memory + i);
-        }
-        std::cout << aux << std::endl;
+        //
+        try {
+            res = curl_easy_perform(curl);
+            imgui = CANCONECT;
+            std::cout << res << std::endl;
+            /* Check for errors */
+            if (res != CURLE_OK) {
+                fprintf(stderr, "curl_easy_perform() failed: %s\n",
+                    curl_easy_strerror(res));
+            }
+            else {
+                printf("%lu bytes retrieved\n", (unsigned long)chunk.size);
+            }
+            //aca guardar en algun lado chunk
 
-        j = nlohmann::json::parse(aux);
-        /* always cleanup */
-        curl_easy_cleanup(curl);
-        free(chunk.memory);
-        curl_global_cleanup();
-        std::cout << j << std::endl;
-        return aux;
+            std::string aux = "";
+            for (int i = 0; i < chunk.size; i++) {
+                aux += *(chunk.memory + i);
+            }
+            std::cout << aux << std::endl;
+
+            j = nlohmann::json::parse(aux);
+            /* always cleanup */
+            curl_easy_cleanup(curl);
+            free(chunk.memory);
+            curl_global_cleanup();
+            std::cout << j << std::endl;
+            imgui = RESPONSEOK;
+            return aux;
+        }
+        catch (std::exception& e) {
+            std::cerr << e.what() << std::endl << "no se pudo conectar a ese nodo" << std::endl;
+            imgui = RESPONSEFAIL;
+        }
     }
     else {
         return "could not perform curl";

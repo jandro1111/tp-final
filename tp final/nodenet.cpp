@@ -5,19 +5,19 @@ void nodenet::createnode(bool nodefull,int port,std::string ip) {//que imgui ver
 	nuevo.nodofull = nodefull;
 	//std::string request[6] = { "blockpost/","transactionpost/","merkleblockpost/","filterpost/","getblocks","getblockheader" };
 	if (nodefull == true) {//le pongo solo las opciones a las que puede acceder el request de arriba ya esta puesto en nodenet, queda aca de referencia nomas
-		nuevo.options.push_back(0);
-		nuevo.options.push_back(1);
-		nuevo.options.push_back(2);
-		nuevo.options.push_back(4);
+		nuevo.options.push_back(0);//0
+		nuevo.options.push_back(1);//1
+		nuevo.options.push_back(2);//2
+		nuevo.options.push_back(4);//3
 	}
 	else {//le pongo solo las opciones a las que puede acceder
-		nuevo.options.push_back(1);
-		nuevo.options.push_back(3);
-		nuevo.options.push_back(5);
+		nuevo.options.push_back(1);//0
+		nuevo.options.push_back(3);//1
+		nuevo.options.push_back(5);//2
 	}
 	nuevo.ip = ip;
 	nuevo.pserver = port;
-	nuevo.pcliente = nuevo.pserver + 1;
+	nuevo.pcliente = port + 1;
 	nuevo.ips = ips;//le paso el vector de los ips que ya tengo
 	nuevo.svports = puertos;//le paso el vector con los 
 	ips.push_back(ip);//agrego la nueva ip a la lista
@@ -63,7 +63,7 @@ bool nodenet::canconect(int node1, int node2) {
 	}
 }
 //
-std::string nodenet::clientconect(int node1, int node2, int option,int cant,std::string id,int bloque,int ntx) {
+std::string nodenet::clientconect(int node1, int node2, int option,int cant,std::string id,int bloque,int ntx,int& imgui) {
 	std::string aux = "";
 	blockchain algo2("ejemplo.json");
 	if (canconect(node1,node2)) {//si se puede conectar
@@ -92,7 +92,7 @@ std::string nodenet::clientconect(int node1, int node2, int option,int cant,std:
 					}
 					aux = nodos[node2].ip;
 					aux += request[nodos[node1].options[option]];
-					aux=nodos[node1].client.client(aux, nodos[node2].pserver, nodos[node1].options[option], cant, id, data.c_str());
+					aux=nodos[node1].client.client(aux, nodos[node2].pserver, nodos[node1].options[option], cant, id, data.c_str(),imgui);
 				}
 				catch (std::exception& e)
 				{

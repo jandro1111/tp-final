@@ -27,10 +27,11 @@ int main()
 	int bloque = 0;
 	int tx = 0;
 	std::string ip = "127.0.0.1/";
+	int imgui = 0;
 		int puerto = CLIENTEP;
 		int puertoc = SERVERP;
-		boost::asio::io_context io_context;//
-		server sv(io_context,puertoc);//
+		//boost::asio::io_context io_context;//
+		//server sv(io_context,puertoc);//
 	int nodeuse;
 	std::cin >> nodeuse;
 	switch (nodeuse) {
@@ -53,24 +54,24 @@ int main()
 				break;
 			}
 			ip += request[i];//cambiar i x option
-			algo.client(ip, puerto, i, cant, id, data.c_str());//despues cambiar i por option
+			algo.client(ip, puerto, i, cant, id, data.c_str(),imgui);//despues cambiar i por option
 			std::cout << "put any number to continue test" << std::endl;
 			cin >> nodeuse;
 			ip = "127.0.0.1/";
 			data = "";
 		}
 		break;
-	case 2://servidor comentar si se esta probando con el servidor de hercules
-		try
-		{
-			sv.start();
-			io_context.run();
-		}
-		catch (std::exception& e)
-		{
-			std::cerr << e.what() << std::endl;
-		}
-		break;
+	//case 2://servidor comentar si se esta probando con el servidor de hercules
+	//	try
+	//	{
+	//		sv.start();
+	//		io_context.run();
+	//	}
+	//	catch (std::exception& e)
+	//	{
+	//		std::cerr << e.what() << std::endl;
+	//	}
+	//	break;
 	default:
 		break;
 
