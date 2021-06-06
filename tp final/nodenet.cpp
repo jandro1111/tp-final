@@ -67,7 +67,7 @@ std::string nodenet::clientconect(int node1, int node2, int option,int cant,std:
 	std::string aux = "";
 	blockchain algo2("ejemplo.json");
 	if (canconect(node1,node2)) {//si se puede conectar
-		if (nodos[node1].nodofull == true && nodos[node2].nodofull == false && (option == 0 || option == 4)) {//un nodo full no puede pedirle bloque o getblock a un nodo spv
+		if (nodos[node1].nodofull == true && nodos[node2].nodofull == false && (option == 2 || option == 3)) {//un nodo full no puede pedirle bloque o getblock a un nodo spv
 			return "esta opcion no es valida para estos nodos";
 		}else{
 			if (option < nodos[node1].options.capacity()) {//si la opcion existe
@@ -75,7 +75,7 @@ std::string nodenet::clientconect(int node1, int node2, int option,int cant,std:
 				{
 					std::string data = "";
 					//nodos[node2].server...
-					switch (nodos[node1].options[option]) {//despues sacar afuera y cambiar i x option
+					switch (nodos[node1].options[option]) {
 					case 0:
 						data = algo2.getblock(bloque).dump();
 						break;
