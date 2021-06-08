@@ -33,34 +33,34 @@ int main()
 		//boost::asio::io_context io_context;//
 		//server sv(io_context,puertoc);//
 	int nodeuse;
-	std::cin >> nodeuse;
-	switch (nodeuse) {
-	case 1://cliente
-		for (int i = 0; i < 6; ++i) {
-			switch (i) {//despues sacar afuera y cambiar i x option
-			case 0:
-				data = algo2.getblock(bloque).dump();
-				break;
-			case 1:
-				data = algo2.sendtx(amount,publicid);
-				break;
-			case 2:
-			data=algo2.makemerkleblock(bloque,tx);
-				break;
-			case 3:
-				data = "{\"Key\" : \"pubkey1\"}";
-				break;
-			default:
-				break;
-			}
-			ip += request[i];//cambiar i x option
-			algo.client(ip, puerto, i, cant, id, data.c_str(),imgui);//despues cambiar i por option
-			std::cout << "put any number to continue test" << std::endl;
-			cin >> nodeuse;
-			ip = "127.0.0.1/";
-			data = "";
-		}
-		break;
+	//std::cin >> nodeuse;
+	//switch (nodeuse) {
+	//case 1://cliente
+	//	for (int i = 0; i < 6; ++i) {
+	//		switch (i) {//despues sacar afuera y cambiar i x option
+	//		case 0:
+	//			data = algo2.getblock(bloque).dump();
+	//			break;
+	//		case 1:
+	//			data = algo2.sendtx(amount,publicid);
+	//			break;
+	//		case 2:
+	//		data=algo2.makemerkleblock(bloque,tx);
+	//			break;
+	//		case 3:
+	//			data = "{\"Key\" : \"pubkey1\"}";
+	//			break;
+	//		default:
+	//			break;
+	//		}
+	//		ip += request[i];//cambiar i x option
+	//		algo.client(ip, puerto, i, cant, id, data.c_str(),imgui);//despues cambiar i por option
+	//		std::cout << "put any number to continue test" << std::endl;
+	//		cin >> nodeuse;
+	//		ip = "127.0.0.1/";
+	//		data = "";
+	//	}
+	//	break;
 	//case 2://servidor comentar si se esta probando con el servidor de hercules
 	//	try
 	//	{
@@ -72,10 +72,10 @@ int main()
 	//		std::cerr << e.what() << std::endl;
 	//	}
 	//	break;
-	default:
+	/*default:
 		break;
 
-	}
+	}*/
 
 	bool running = true;
 	Gui myGui;

@@ -18,33 +18,9 @@ void nodenet::createnode(bool nodefull,int port,std::string ip) {//que imgui ver
 	nuevo.ip = ip;
 	nuevo.pserver = port;
 	nuevo.pcliente = port + 1;
-	nuevo.ips = ips;//le paso el vector de los ips que ya tengo
-	nuevo.svports = puertos;//le paso el vector con los 
+	nuevo.vecinos.clear();
 	ips.push_back(ip);//agrego la nueva ip a la lista
 	puertos.push_back(port);//agrego el nuevo puerto a la lista
-
-	std::vector<std::string> aux;
-	std::vector<int> aux1;
-	for (int i = 0; i < nodos.capacity(); i++) {//actualizo la info de los demas nodos
-		for (std::vector<std::string>::iterator it = ips.begin(); it != ips.end();it++) {
-			if (nodos[i].ip==*it) {//si es la ip de este nodo la salteo
-			}
-			else {
-				aux.push_back(*it);
-			}
-		}
-		for (std::vector<int>::iterator it = puertos.begin(); it != puertos.end(); it++) {
-			if (nodos[i].pserver == *it) {//si es la ip de este nodo la salteo
-			}
-			else {
-				aux1.push_back(*it);
-			}
-		}
-		nodos[i].ips = aux;
-		nodos[i].svports = aux1;
-		aux.empty();
-		aux1.empty();
-	}
 	nodos.push_back(nuevo);//ahora si, meto el nuevo nodo en la net
 }
 
@@ -63,10 +39,38 @@ bool nodenet::canconect(int node1, int node2) {
 	}
 }
 //
+bool nodenet::conectnode(int node1,int node2) {
+	if (canconect(node1, node2)) {//si es un input valido los "conecto"
+		nodos[node1].vecinos.push_back(node2);
+		nodos[node2].vecinos.push_back(node1);
+	}
+	else {//esos nodos o no existen o no se pueden conectar
+		return false;
+	}
+}
+//
+std::vector<int> nodenet::getvecinosnodo(int nodo) {
+	std::vector<int> null;
+	null.clear();
+	if (nodo < nodos.capacity()) {
+		return nodos[nodo].vecinos;
+	}
+	else {
+		return null;
+	}
+}
+//
 std::string nodenet::clientconect(int node1, int node2, int option,int cant,std::string id,int bloque,int ntx,int& imgui) {
 	std::string aux = "";
 	blockchain algo2("ejemplo.json");
-	if (canconect(node1,node2)) {//si se puede conectar
+	bool isconected = false;
+	for (std::vector<int>::iterator it = nodos[node1].vecinos.begin(); it != nodos[node1].vecinos.end(); ++it) {
+		if (*it==node2) {//si esta conectado
+			isconected = true;
+			break;
+		}
+	}
+	if (canconect(node1,node2)||isconected==false) {//si se puede conectar
 		if (nodos[node1].nodofull == true && nodos[node2].nodofull == false && (option == 2 || option == 3)) {//un nodo full no puede pedirle bloque o getblock a un nodo spv
 			return "esta opcion no es valida para estos nodos";
 		}else{
