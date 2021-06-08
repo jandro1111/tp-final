@@ -183,6 +183,9 @@
     <Font Include="Fonts\Roboto-Black.ttf" />
     <Font Include="Fonts\Roboto-Light.ttf" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="edacoinLogo.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

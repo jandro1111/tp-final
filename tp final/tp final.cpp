@@ -77,8 +77,6 @@ int main()
 
 	}
 
-
-	/*
 	bool running = true;
 	Gui myGui;
 	myGui.initGUI();
@@ -155,6 +153,9 @@ int main()
 					if (myGui.isMerkleTree()) {
 						myGui.drawMerkleTree();
 					}
+					if (myGui.getGuiState() == MAIN_WINDOW) {
+						myGui.drawMainWindow();
+					}
 
 					myGui.update();
 				}
@@ -183,5 +184,4 @@ int main()
 	myGui.destroyAllegro();
 
 	return 0;
-	*/
 }

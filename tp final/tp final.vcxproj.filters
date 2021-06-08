@@ -133,4 +133,9 @@
       <Filter>Resource Files\Fonts</Filter>
     </Font>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="edacoinLogo.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

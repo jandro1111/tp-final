@@ -8,6 +8,7 @@
 
 #include "./lib/imgui.h"
 #include "./lib/imgui_impl_allegro5.h"
+#include "./lib/imgui_internal.h"
 #include <allegro5/allegro_color.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
@@ -27,6 +28,7 @@
 #define     FPS                 10
 
 #define     TREE_FONT           "./Fonts/Roboto-Light.ttf"
+#define     EDACOIN             "edacoinLogo.png"
 
 // --------------------------     colores      -------------------------- //
 #define BLACK           al_map_rgb(14,14,14)
@@ -42,9 +44,9 @@
 
 #define     NO_SELECTION        -1
 
-enum states { MAIN_WINDOW, OPEN_FILE };
+enum states { MAIN_WINDOW, BLOCKS, OPEN_FILE, NODE};
 
-enum actions { NOTHING, NOTIFY_NEW_PATH, SEARCH_FILES, CALC_MERKLE, SHOW_TREE };
+enum actions { NOTHING, NOTIFY_NEW_PATH, SEARCH_FILES, CALC_MERKLE, SHOW_TREE, CREATE_NODE, CONNECT_NODES, SEND_MESSAGE};
 
 //Estructura que guarda la informacion a mostrar al usuario del bloque deseado
 typedef struct {
@@ -83,7 +85,7 @@ public:
     void setMerkleRoot(std::string merkleRootCalculated, std::string merkleRootBlock);
 
     //Setter del Merkle Tree.
-    void setMerkleTree(std::vector <std::string>);
+    void setMerkleTree(std::vector<std::vector<std::string>>);
 
     //Setter de informacion primordial del bloque
     void setBlockInfo(std::string blockID, std::string previousBlockID, int cantTransactions, int blockNumber, int nonce);
@@ -96,6 +98,12 @@ public:
 
     //Graficacion de Merkle Tree
     void drawMerkleTree();
+
+    //Devuelve ventana actual de la GUI
+    int getGuiState();
+
+    //Graficacion de Imagen en Main Window
+    void drawMainWindow();
 
     //Display de Allegro
     ALLEGRO_DISPLAY* display;
@@ -110,6 +118,7 @@ private:
 
     //Variables de Allegro.
     ALLEGRO_BITMAP* buffer;
+    ALLEGRO_BITMAP* bitmap;
     ALLEGRO_FONT* font;
 
     //Variable de control de acciones. 
@@ -129,10 +138,16 @@ private:
     std::string merkleRootBlock;
 
     //Merkle Tree del bloque seleccionado
-    std::vector <std::string> merkleTree;
+    std::vector<std::vector<std::string>> merkleTree;
 
     //Variable para guardar el path introducido por el usuario.
     char pathName[50] = { 0 };
+
+    //Variable para introducir la IP de un nodo
+    char nodeIPtext[50] = { 0 };
+
+    //Variable para introducir el puerto de un nodo
+    char nodePortText[50] = { 0 };
 
     //Archivos json del path seleccionado.
     std::vector<std::filesystem::path> files;
@@ -154,6 +169,9 @@ private:
 
     //Variable para controlar cambio de bloque seleccionado y optimizar el programa
     int currentBlock;
+
+    //Vector de nodos
+    std::vector<std::string> nodes;
 
     //Instancia de la clase File para navegar un directorio
     Files path;

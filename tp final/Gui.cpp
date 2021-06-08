@@ -6,8 +6,9 @@ using namespace std;
 Gui::Gui() {
     display = NULL;
     buffer = NULL;
+    bitmap = NULL;
     font = NULL;
-    state = OPEN_FILE;
+    state = MAIN_WINDOW;
     doAction = NOTHING;
     selectedFile = 0;
     selectedBlock = 0;
@@ -17,6 +18,8 @@ Gui::Gui() {
     merkleTree.clear();
     newMerkleRoot = false;
     newMerkleTree = false;
+    selectedPath.clear();
+    currentPath.clear();
 }
 
 //Inicializacion de Allegro e ImGui.
@@ -78,6 +81,14 @@ void Gui::GUIwindow()
     ImGuiSliderFlags log_slider = reg_slider | ImGuiSliderFlags_Logarithmic;
     const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
 
+    //Variables para creacion de nodos
+    static const char* nodeComboBox[] = { "FULL", "SPV" };
+    static const char* fullMessages[] = { "Block", "Transaction", "Merkleblock", "Get Blocks"};
+    static const char* spvMessages[] = { "Transaction", "Filter", "Get block header" };
+    static int nodeType = 0;
+    static int firstNode = 0;
+    static int secondNode = 0;
+
 
     //Variable de control de ventana de ImGui
     static bool windowActive = true;
@@ -85,22 +96,84 @@ void Gui::GUIwindow()
     //Widgets y acciones segun estado. 
     switch (this->state) {
 
-        //MAIN_WINDOW: widgets y acciones sobre los bloques cargados del archivo seleccionado en FILES.
+    //MAIN_WINDOW
     case MAIN_WINDOW:
         ImGui::SetNextWindowSize(ImVec2(DISPLAY_SIZE_X, DISPLAY_SIZE_Y), ImGuiCond_Always);
         ImGui::Begin("Main", &windowActive, ImGuiWindowFlags_MenuBar);
         //Menu Bar
         if (ImGui::BeginMenuBar())
         {
-            if (ImGui::BeginMenu("Main"))
+            if (ImGui::BeginMenu("Menu"))
             {
                 state = MAIN_WINDOW;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Nodes"))
+            {
+                state = NODE;
                 doAction = NOTHING;
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("File"))
             {
                 state = OPEN_FILE;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Blocks"))
+            {
+                state = BLOCKS;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
+        ImGui::Dummy(ImVec2(20.0f, 80.0f));
+        if (ImGui::Button("Nodes")) {
+            state = NODE;
+        }
+        ImGui::Dummy(ImVec2(20.0f, 15.0f));
+        if (ImGui::Button("File")) {
+            state = OPEN_FILE;
+        }
+        ImGui::Dummy(ImVec2(20.0f, 15.0f));
+        if (ImGui::Button("Blocks")) {
+            state = BLOCKS;
+        }
+
+        ImGui::End();
+        break;
+
+    //BLOCKS: widgets y acciones sobre los bloques cargados del archivo seleccionado en FILES.
+    case BLOCKS:
+        ImGui::SetNextWindowSize(ImVec2(DISPLAY_SIZE_X, DISPLAY_SIZE_Y), ImGuiCond_Always);
+        ImGui::Begin("Blocks", &windowActive, ImGuiWindowFlags_MenuBar);
+
+        //Menu Bar
+        if (ImGui::BeginMenuBar())
+        {
+            if (ImGui::BeginMenu("Menu"))
+            {
+                state = MAIN_WINDOW;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Nodes"))
+            {
+                state = NODE;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("File"))
+            {
+                state = OPEN_FILE;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Blocks"))
+            {
+                state = BLOCKS;
                 doAction = NOTHING;
                 ImGui::EndMenu();
             }
@@ -172,24 +245,164 @@ void Gui::GUIwindow()
         ImGui::End();
         break;
 
-        //OPEN_FILE: navegacion y seleccion sobre el path introducido por el usuario.
-    case OPEN_FILE:
+    case NODE:
 
         ImGui::SetNextWindowSize(ImVec2(DISPLAY_SIZE_X, DISPLAY_SIZE_Y), ImGuiCond_Always);
-        ImGui::Begin("File", &windowActive, ImGuiWindowFlags_MenuBar);
-
-        //Mismas Menu Bar
+        ImGui::Begin("Node", &windowActive, ImGuiWindowFlags_MenuBar);
+        //Menu Bar
         if (ImGui::BeginMenuBar())
         {
-            if (ImGui::BeginMenu("Main"))
+            if (ImGui::BeginMenu("Menu"))
             {
                 state = MAIN_WINDOW;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Nodes"))
+            {
+                state = NODE;
                 doAction = NOTHING;
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("File"))
             {
                 state = OPEN_FILE;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Blocks"))
+            {
+                state = BLOCKS;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
+
+        if (ImGui::Button("Create Node")) {
+            doAction = CREATE_NODE;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Connect Node")) {
+            doAction = CONNECT_NODES;
+            nodes.push_back("Holis");
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Send Message")) {
+            doAction = SEND_MESSAGE;
+        }
+        ImGui::Separator();
+
+        switch (this->doAction) {
+        case CREATE_NODE:
+
+            ImGui::InputText("Node IP", nodeIPtext, 50);
+            ImGui::InputText("Node Port", nodePortText, 50);
+            ImGui::Combo("Node Type", &nodeType, nodeComboBox, IM_ARRAYSIZE(nodeComboBox));
+
+            ImGui::Dummy(ImVec2(0.0f, 20.0f));
+
+            if (ImGui::Button("Create")) {
+                //Guardar input 
+                //Limpiar ventanas
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Close")) {
+                doAction = NOTHING;
+            }
+            break;
+        case CONNECT_NODES:
+            if (ImGui::BeginCombo("Selected Node", nodes[firstNode].c_str(), 0))
+            {
+                for (int n = 0; n < nodes.size(); n++)
+                {
+                    const bool is_selected = (firstNode == n);
+                    if (ImGui::Selectable(nodes[n].c_str(), is_selected))
+                        firstNode = n;
+
+                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+            //PENSAR COMO INTEGRAR ESTO!!!
+            if (ImGui::BeginCombo("Neighbour Node", nodes[secondNode].c_str(), 0))
+            {
+                for (int n = 0; n < nodes.size(); n++)
+                {
+                    const bool is_selected = (secondNode == n);
+                    if (ImGui::Selectable(nodes[n].c_str(), is_selected))
+                        firstNode = n;
+
+                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
+            ImGui::Dummy(ImVec2(0.0f, 20.0f));
+            if (ImGui::Button("Connect")) {
+                //Guardar input 
+                //Limpiar ventanas
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Close")) {
+                doAction = NOTHING;
+            }
+            break;
+        case SEND_MESSAGE:
+            //COMBO BOX: FROM
+            //COMBO BOX: TO
+            //COMBO BOX: MESSAGE Full o SPV
+            ImGui::Dummy(ImVec2(0.0f, 20.0f));
+
+            if (ImGui::Button("Send")) {
+                //Guardar input 
+                //Limpiar ventanas
+                //MUESTRA ESTADO DE CONECCION. VOLVER A ESCUCHAR.
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Close")) {
+                doAction = NOTHING;
+            }
+            break;
+        }
+
+        ImGui::End();
+        break;
+
+    //OPEN_FILE: navegacion y seleccion sobre el path introducido por el usuario.
+    case OPEN_FILE:
+
+        ImGui::SetNextWindowSize(ImVec2(DISPLAY_SIZE_X, DISPLAY_SIZE_Y), ImGuiCond_Always);
+        ImGui::Begin("File", &windowActive, ImGuiWindowFlags_MenuBar);
+
+        //Menu Bar
+        if (ImGui::BeginMenuBar())
+        {
+            if (ImGui::BeginMenu("Menu"))
+            {
+                state = MAIN_WINDOW;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Nodes"))
+            {
+                state = NODE;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("File"))
+            {
+                state = OPEN_FILE;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Blocks"))
+            {
+                state = BLOCKS;
                 doAction = NOTHING;
                 ImGui::EndMenu();
             }
@@ -220,8 +433,8 @@ void Gui::GUIwindow()
         }
         ImGui::SameLine();
         if (ImGui::Button("Close")) {
-            state = MAIN_WINDOW;
             doAction = NOTHING;
+            memset(pathName, 0, sizeof(pathName));
         }
         ImGui::Separator();
 
@@ -235,7 +448,7 @@ void Gui::GUIwindow()
                 if (selectedFile >= (int)dirs.size()) {
                     currentPath = files[selectedFile - dirs.size()];
                     selectedPath = files[selectedFile - dirs.size()];
-                    state = MAIN_WINDOW;
+                    state = BLOCKS;
                     doAction = NOTIFY_NEW_PATH;
                     selectedBlock = 0;
                     currentBlock = NO_SELECTION;
@@ -313,15 +526,11 @@ void Gui::drawMerkleTree(void) {
 
     //Variables para calculo de dimensiones del buffer segun altura del arbol.
     static int treeHeight = 0;
-    static int treeNodes = 1;
     static int sizeY = (int)(BUFFER_SIZE_Y / (treeHeight + 1));;
     static int fontSize = 0;
     //Por optimizacion, se recalcula solamente al introducir un nuevo merkle tree.
     if (newMerkleTree) {
-        while (treeNodes < (int)merkleTree.size()) {
-            treeNodes *= 2;
-            treeHeight++;
-        }
+        treeHeight = merkleTree.size();
         sizeY = (int)(BUFFER_SIZE_Y / (treeHeight + 2));
         fontSize = (int)(BUFFER_SIZE_Y / (treeHeight * 6));
         al_destroy_font(font);
@@ -333,33 +542,36 @@ void Gui::drawMerkleTree(void) {
         newMerkleTree = false;
     }
 
-    int node = merkleTree.size();
+    int node = 0;
     int i = 1;
     //El primer for itera por los niveles del arbol.
     for (int height = 0; height != treeHeight; height++, i *= 2) {
+        node = merkleTree[treeHeight - height - 1].size() - 1;
         //El segundo for grafica los nodos en cada nivel.
         int sizeX = (int)(BUFFER_SIZE_X / (i + 1));
-        for (int j = i; j > 0; j--) {
-            if (node != 0) {
-                al_draw_text(font, WHITE, sizeX * (j), sizeY * (height), ALLEGRO_ALIGN_CENTRE, merkleTree[node - 1].c_str());
-                if (height == (treeHeight - 1)) {
-                    al_draw_text(font, YELLOW, sizeX * (j), sizeY * (height + 1), ALLEGRO_ALIGN_CENTRE, ("T" + std::to_string(j - 1)).c_str());
-                    al_draw_line(sizeX * (j), sizeY * (height + 1) - fontSize, sizeX * (j), sizeY * (height + 1) - fontSize * 2, WHITE, (float)(8.0 / treeHeight));
+        for (int j = i; node >= 0; j--, node--) {
+            al_draw_text(font, WHITE, sizeX * (j), sizeY * (height), ALLEGRO_ALIGN_CENTRE, merkleTree[treeHeight - height - 1][node].c_str());
+            if (height == (treeHeight - 1)) {
+                al_draw_text(font, YELLOW, sizeX * (j), sizeY * (height + 1), ALLEGRO_ALIGN_CENTRE, ("T" + std::to_string(j - 1)).c_str());
+                al_draw_line(sizeX * (j), sizeY * (height + 1) - fontSize, sizeX * (j), sizeY * (height + 1) - fontSize * 2, WHITE, (float)(8.0 / treeHeight));
+            }
+            if (i > 1) {
+                //En el caso de ser par
+                if ((j % 2) == 0) {
+                    al_draw_line(sizeX * (j), sizeY * (height)-fontSize, sizeX * (j - 1), sizeY * (height)-fontSize, WHITE, (float)(8.0 / treeHeight));
+                    al_draw_line(sizeX * (j)-(int)(sizeX / 2), sizeY * (height)-fontSize, sizeX * (j)-(int)(sizeX / 2), sizeY * (height)-fontSize * 2, WHITE, (float)(10.0 / treeHeight));
                 }
-                if (i > 1) {
-                    //En el caso de ser par
-                    if ((j % 2) == 0) {
-                        al_draw_line(sizeX * (j), sizeY * (height)-fontSize, sizeX * (j - 1), sizeY * (height)-fontSize, WHITE, (float)(8.0 / treeHeight));
-                        al_draw_line(sizeX * (j)-(int)(sizeX / 2), sizeY * (height)-fontSize, sizeX * (j)-(int)(sizeX / 2), sizeY * (height)-fontSize * 2, WHITE, (float)(10.0 / treeHeight));
-                    }
-                }
-                node--;
             }
         }
     }
 
     al_set_target_backbuffer(display);
     al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_SIZE_X, BUFFER_SIZE_Y, 5, DISPLAY_SIZE_Y - BUFFER_SIZE_Y, BUFFER_SIZE_X, DISPLAY_SIZE_Y, 0);
+}
+
+//Graficacion de Imagen en Main Window
+void Gui::drawMainWindow() {
+    al_draw_bitmap(bitmap, 150,50,0);
 }
 
 //Devuelve Block deseado dentro del archivo json. 
@@ -398,6 +610,10 @@ int Gui::getSelectedBlock() {
     return NO_SELECTION;
 }
 
+int Gui::getGuiState() {
+    return state;
+}
+
 //Setter del Merkle Root calculado y real del bloque.
 void Gui::setMerkleRoot(std::string merkleRootCalculated, std::string merkleRootBlock) {
     this->merkleRootCalculated = merkleRootCalculated;
@@ -405,7 +621,7 @@ void Gui::setMerkleRoot(std::string merkleRootCalculated, std::string merkleRoot
 }
 
 //Setter del Merkle Tree.
-void Gui::setMerkleTree(std::vector <std::string> merkle) {
+void Gui::setMerkleTree(std::vector<std::vector<std::string>> merkle) {
     merkleTree.clear();
     merkleTree = merkle;
     newMerkleTree = true;
@@ -455,6 +671,12 @@ bool Gui::initAllegro(void)
     if (buffer == NULL)
     {
         fprintf(stderr, "Failed to initialize bitmap buffer!\n");
+        return false;
+    }
+    bitmap = al_load_bitmap(EDACOIN);
+    if (buffer == NULL)
+    {
+        fprintf(stderr, "Failed to initialize bitmap!\n");
         return false;
     }
     return true;
