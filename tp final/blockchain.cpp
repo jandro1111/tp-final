@@ -610,7 +610,7 @@ std::string blockchain::makemerklepath(int block, int tx) {
             aux += str(boost::format("\"id\":\"%1%\",")%*it);
         }
     }
-    cout<<aux<<endl;
+    //cout<<aux<<endl;
     return aux;
 }
 //

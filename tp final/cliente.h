@@ -13,9 +13,14 @@ class cliente
 {
 public:
     std::string client(std::string request,int puerto,int option,int cant,std::string id, const char* data,int& imgui);//recive la request q hace el puerto y devuelve un string con lo que recivio
-
+    void configClient();
 private:
     nlohmann::json j;//aca guardo la response
+
+    CURL* curl;					//Guarda configuraciones de una transferencia.
+	CURLM* multiHandle;			//Administra easy handles.
+	CURLMcode output;			//Manejo de errores.
+    int stillRunning;
 
 };
 
