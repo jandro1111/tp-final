@@ -5,6 +5,7 @@
 #include <string>
 
 #include "files.h"
+#include "nodenet.h"
 
 #include "./lib/imgui.h"
 #include "./lib/imgui_impl_allegro5.h"
@@ -171,13 +172,15 @@ private:
     int currentBlock;
 
     //Vector de nodos
-    std::vector<std::string> nodes;
+    //std::vector<std::string> nodes;
 
     //Instancia de la clase File para navegar un directorio
     Files path;
 
     //Guarda informacion de todos los bloques del archivo seleccionado
     std::vector<BlockInfo> blockInfo;
+
+    nodenet userNodes;
 };
 
 
