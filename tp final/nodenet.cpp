@@ -1,5 +1,6 @@
 #include "nodenet.h"
 
+
 void nodenet::createnode(bool nodefull,int port,std::string ip) {//que imgui verifique que el puerto del servidor sea correcto
 	struct nodo nuevo;
 	nuevo.nodofull = nodefull;
@@ -22,8 +23,12 @@ void nodenet::createnode(bool nodefull,int port,std::string ip) {//que imgui ver
 	ips.push_back(ip);//agrego la nueva ip a la lista
 	puertos.push_back(port);//agrego el nuevo puerto a la lista
 	nodos.push_back(nuevo);//ahora si, meto el nuevo nodo en la net
+	cantnodos++;
 }
-
+//
+int nodenet::getcantnodos() {
+	return cantnodos;
+}
 //
 bool nodenet::canconect(int node1, int node2) {
 	if ((node1 < nodos.capacity()) && (node2 < nodos.capacity())) {
@@ -40,9 +45,11 @@ bool nodenet::canconect(int node1, int node2) {
 }
 //
 bool nodenet::conectnode(int node1,int node2) {
+
 	if (canconect(node1, node2)) {//si es un input valido los "conecto"
 		nodos[node1].vecinos.push_back(node2);
 		nodos[node2].vecinos.push_back(node1);
+		return true;
 	}
 	else {//esos nodos o no existen o no se pueden conectar
 		return false;
@@ -60,8 +67,14 @@ std::vector<int> nodenet::getvecinosnodo(int nodo) {
 	}
 }
 //
-std::string nodenet::clientconect(int node1, int node2, int option,int cant,std::string id,int bloque,int ntx,int& imgui) {
-	std::string aux = "";
+nodo nodenet::getnodo(int nodo) {
+		return nodos[nodo];
+}
+//
+nlohmann::json nodenet::clientconect(int node1, int node2, int option,int cant,std::string id,int bloque,int ntx,int& imgui) {
+	std::string iniconfig = "{\status\": false,\"result\": 2 }";
+	nlohmann::json  aux;
+	aux.parse(iniconfig);
 	blockchain algo2("ejemplo.json");
 	bool isconected = false;
 	for (std::vector<int>::iterator it = nodos[node1].vecinos.begin(); it != nodos[node1].vecinos.end(); ++it) {
@@ -72,7 +85,7 @@ std::string nodenet::clientconect(int node1, int node2, int option,int cant,std:
 	}
 	if (canconect(node1,node2)||isconected==false) {//si se puede conectar
 		if (nodos[node1].nodofull == true && nodos[node2].nodofull == false && (option == 2 || option == 3)) {//un nodo full no puede pedirle bloque o getblock a un nodo spv
-			return "esta opcion no es valida para estos nodos";
+			return aux;
 		}else{
 			if (option < nodos[node1].options.capacity()) {//si la opcion existe
 				try
@@ -104,13 +117,13 @@ std::string nodenet::clientconect(int node1, int node2, int option,int cant,std:
 				}
 			}
 			else {
-				return "esa opcion no existe";
+				return aux;
 			}
 
 		}
 	}
 	else {//no se puede conectar con ese nodo
-		return "estos nodos no se pueden conectar";
+		return aux;
 	}
 	return aux;
 }
