@@ -35,57 +35,57 @@ int main()
 	int nodeuse;
 	std::cin >> nodeuse;
 	algo.configClient();
-	try{
-		switch (nodeuse) {
-		case 1://cliente
-			for (int i = 0; i < 6; ++i) {
-				switch (i) {//despues sacar afuera y cambiar i x option
-				case 0:
-					data = algo2.getblock(bloque).dump();
-					break;
-				case 1:
-					data = algo2.sendtx(amount, publicid);
-					break;
-				case 2:
-					data = algo2.makemerkleblock(bloque, tx);
-					break;
-				case 3:
-					data = "{\"Key\" : \"pubkey1\"}";
-					break;
-				default:
-					break;
-				}
-				ip += request[i];//cambiar i x option
-				while (!imgui) {
-					algo.client(ip, puerto, i, cant, id, data.c_str(), imgui);//despues cambiar i por option	
-				}
-				std::cout << "put any number to continue test" << std::endl;
-				cin >> nodeuse;
-				ip = "127.0.0.1/";
-				data = "";
-			}
-			break;
-	case 2://servidor comentar si se esta probando con el servidor de hercules
-		try
-		{
-			sv.start();
-			io_context.run();
-		}
-		catch (std::exception& e)
-		{
-			std::cerr << e.what() << std::endl;
-		}
-		break;
-	default:
-		break;
+	//try{
+	//	switch (nodeuse) {
+	//	case 1://cliente
+	//		for (int i = 0; i < 6; ++i) {
+	//			switch (i) {//despues sacar afuera y cambiar i x option
+	//			case 0:
+	//				data = algo2.getblock(bloque).dump();
+	//				break;
+	//			case 1:
+	//				data = algo2.sendtx(amount, publicid);
+	//				break;
+	//			case 2:
+	//				data = algo2.makemerkleblock(bloque, tx);
+	//				break;
+	//			case 3:
+	//				data = "{\"Key\" : \"pubkey1\"}";
+	//				break;
+	//			default:
+	//				break;
+	//			}
+	//			ip += request[i];//cambiar i x option
+	//			while (!imgui) {
+	//				algo.client(ip, puerto, i, cant, id, data.c_str(), imgui);//despues cambiar i por option	
+	//			}
+	//			std::cout << "put any number to continue test" << std::endl;
+	//			cin >> nodeuse;
+	//			ip = "127.0.0.1/";
+	//			data = "";
+	//		}
+	//		break;
+	//case 2://servidor comentar si se esta probando con el servidor de hercules
+	//	try
+	//	{
+	//		sv.start();
+	//		io_context.run();
+	//	}
+	//	catch (std::exception& e)
+	//	{
+	//		std::cerr << e.what() << std::endl;
+	//	}
+	//	break;
+	//default:
+	//	break;
 
-	}
-	}
-	catch (std::exception& e) {
-		std::cerr << e.what() << std::endl << "no se pudo conectar a ese nodo" << std::endl;
-		imgui = 1;
-		//imgui = RESPONSEFAIL;
-	}
+	//}
+	//}
+	//catch (std::exception& e) {
+	//	std::cerr << e.what() << std::endl << "no se pudo conectar a ese nodo" << std::endl;
+	//	imgui = 1;
+	//	//imgui = RESPONSEFAIL;
+	//}
 	bool running = true;
 	Gui myGui;
 	myGui.initGUI();

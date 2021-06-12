@@ -71,7 +71,6 @@ void server::connection_received_cb(const boost::system::error_code& error)//aca
 	{
 		boost::array<char,12800> buf;
 		boost::system::error_code error;
-
 		size_t len = socket_.read_some(boost::asio::buffer(buf), error);
 
 		if (error == boost::asio::error::eof)

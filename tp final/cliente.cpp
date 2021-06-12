@@ -144,7 +144,7 @@ void cliente::configClient()
 }
 
 
-std::string cliente::client(std::string request,int puerto,int option,int cant,std::string id, const char* data,int& imgui)
+nlohmann::json cliente::client(std::string request,int puerto,int option,int cant,std::string id, const char* data,int& imgui)
 {
     struct MemoryStruct chunk;
     chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
@@ -164,6 +164,7 @@ std::string cliente::client(std::string request,int puerto,int option,int cant,s
              request += std::to_string(cant);
              break;
          default:
+             request += "conect";
             break;
     }
 
@@ -249,7 +250,7 @@ std::string cliente::client(std::string request,int puerto,int option,int cant,s
             free(chunk.memory);
             std::cout << "J" << j << std::endl;
            //imgui = RESPONSEOK;
-            return aux;
+            return j;
         }
         catch (std::exception& e) {
             std::cerr << e.what() << std::endl << "HOLAAA no se pudo conectar a ese nodo" << std::endl;
