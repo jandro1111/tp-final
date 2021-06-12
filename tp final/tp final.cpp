@@ -116,6 +116,10 @@ int main()
 			// Manda el evento a Dear ImGui para que lo procese
 			ImGui_ImplAllegro5_ProcessEvent(&ev);
 
+
+			//Servidores y clientes
+
+
 			switch (ev.type) {
 			case ALLEGRO_EVENT_TIMER:
 				if (ev.timer.source == timer) {

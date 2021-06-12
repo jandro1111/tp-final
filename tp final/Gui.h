@@ -45,7 +45,7 @@
 
 #define     NO_SELECTION        -1
 
-enum states { MAIN_WINDOW, BLOCKS, OPEN_FILE, NODE};
+enum states { MAIN_WINDOW, BLOCKS, OPEN_FILE, NODE, LOG};
 
 enum actions { NOTHING, NOTIFY_NEW_PATH, SEARCH_FILES, CALC_MERKLE, SHOW_TREE, CREATE_NODE, CONNECT_NODES, SEND_MESSAGE};
 
@@ -106,6 +106,9 @@ public:
     //Graficacion de Imagen en Main Window
     void drawMainWindow();
 
+    //Graficacion de conecciones entre nodos
+    void drawNodesConnections();
+
     //Display de Allegro
     ALLEGRO_DISPLAY* display;
 
@@ -150,6 +153,12 @@ private:
     //Variable para introducir el puerto de un nodo
     char nodePortText[50] = { 0 };
 
+    //Variable para introducir el puerto de un nodo
+    char selection1[50] = { 0 };
+
+    //Variable para introducir el puerto de un nodo
+    char selection2[50] = { 0 };
+
     //Archivos json del path seleccionado.
     std::vector<std::filesystem::path> files;
 
@@ -168,17 +177,26 @@ private:
     //Variable para seleccion de los bloques con RadiusButton de ImGui
     int selectedBlock;
 
+    //Variable de seleccion de primer nodo
+    int firstNode;
+
+    //Variable de seleccion de segundo nodo
+    int secondNode;
+
     //Variable para controlar cambio de bloque seleccionado y optimizar el programa
     int currentBlock;
-
-    //Vector de nodos
-    //std::vector<std::string> nodes;
 
     //Instancia de la clase File para navegar un directorio
     Files path;
 
     //Guarda informacion de todos los bloques del archivo seleccionado
     std::vector<BlockInfo> blockInfo;
+
+    //Variable para mostrar estados de conexion entre nodos
+    int checkConnectionState;
+
+    //CONECCIONES
+    bool isNewConnection;
 
     nodenet userNodes;
 };

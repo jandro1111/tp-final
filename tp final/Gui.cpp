@@ -1,4 +1,6 @@
 #include "Gui.h"
+#include <time.h>
+#include <cmath>
 
 using namespace std;
 
@@ -20,6 +22,9 @@ Gui::Gui() {
     newMerkleTree = false;
     selectedPath.clear();
     currentPath.clear();
+    isNewConnection = false;
+    firstNode = NO_SELECTION;
+    secondNode = NO_SELECTION;
 }
 
 //Inicializacion de Allegro e ImGui.
@@ -87,9 +92,8 @@ void Gui::GUIwindow()
     static const char* spvMessages[] = { "", "Transaction", "Filter", "Get block header" };
     static int nodeType = 0;
     static int messageType = 0;
-    static int firstNode = NO_SELECTION;
-    static int secondNode = NO_SELECTION;
     static const char* preview_text = "";
+    static int cantNodes = 0;
 
     //Variable de control de ventana de ImGui
     static bool windowActive = true;
@@ -316,13 +320,7 @@ void Gui::GUIwindow()
                     memset(nodeIPtext, 0, sizeof(nodeIPtext));
                     memset(nodePortText, 0, sizeof(nodePortText));
                     nodeType = 0;
-                    //std::cout << "NODO: " << nodeType << " " << port << " " << ip << std::endl;
-                }
-                else if (port % 2 != 0) {
-                    ImGui::Text("Node server port must be an even number!");
-                }
-                else if (ip == "") {
-                    ImGui::Text("Please introduce a valid IP!");
+                    std::cout << "NODO: " << nodeType << " " << port << " " << ip << std::endl;
                 }
             }
             ImGui::SameLine();
@@ -337,40 +335,58 @@ void Gui::GUIwindow()
         case CONNECT_NODES:
             ImGui::TextColored(ImVec4(1, 1, 0, 1), "Connect Nodes");
             //Generacion de texto antes de abrir la combobox
+            cantNodes = this->userNodes.getcantnodos();
             preview_text = (userNodes.nodos.size() != 0) ? ((firstNode != NO_SELECTION) ? this->userNodes.nodos[firstNode].ip.c_str() : "") : "";
+            //preview_text = (cantNodes != 0) ? ((firstNode != NO_SELECTION) ? (this->userNodes.getnodo(firstNode)).ip.c_str() : "") : "";
+
             //Primera combobox permite elegir el nodo desde el cual se va a conectar
             if (ImGui::BeginCombo("Selected Node", preview_text, 0))
             {
-                for (int n = 0; n != userNodes.nodos.size(); n++)
+                for (int n = 0; n != cantNodes; n++)
                 {
                     const bool is_selected = (firstNode == n);
-                    if (ImGui::Selectable(this->userNodes.nodos[n].ip.c_str(), is_selected)) {
+                    if (ImGui::Selectable(this->userNodes.getnodo(n).ip.c_str(), is_selected)) {
                         firstNode = n;
                         secondNode = NO_SELECTION;
                     }
-                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+
                     if (is_selected)
                         ImGui::SetItemDefaultFocus();
                 }
                 ImGui::EndCombo();
             }
             preview_text = (userNodes.nodos.size() != 0) ? ((secondNode != NO_SELECTION) ? this->userNodes.nodos[secondNode].ip.c_str() : "") : "";
+            //preview_text = (cantNodes != 0) ? ((secondNode != NO_SELECTION) ? (this->userNodes.getnodo(secondNode)).ip.c_str() : "") : "";
+
             //Segunda combobox muestra opciones posibles de nodos para conectarse
             if (ImGui::BeginCombo("Neighbour Node", preview_text, 0))
             {
-                for (int n = 0; n != userNodes.nodos.size(); n++)
-                {
-                    //No se muestra la opcion del nodo ya seleccionado
-                    if (n != firstNode) {
-                        //En el caso que los dos sean nodos SPV, no se muestra esa opcion
-                        if (!(!this->userNodes.nodos[firstNode].nodofull && !this->userNodes.nodos[n].nodofull)) {
-                            const bool is_selected = (secondNode == n);
-                            if (ImGui::Selectable(this->userNodes.nodos[n].ip.c_str(), is_selected))
-                                secondNode = n;
+                if (firstNode != NO_SELECTION) {
+                    for (int n = 0; n != cantNodes; n++)
+                    {
+                        //No se muestra la opcion del nodo ya seleccionado
+                        if (n != firstNode) {
+                            //En el caso que los dos sean nodos SPV, no se muestra esa opcion
+                            if (!(!this->userNodes.getnodo(firstNode).nodofull && !this->userNodes.getnodo(n).nodofull)) {
+                                const bool is_selected = (secondNode == n);
+                                int neighbour = 0;
+                                //Si ya tiene vecinos, no aparecen en la lista
+                                if (this->userNodes.getnodo(firstNode).vecinos.size() != 0) {
+                                    for (int i = 0; i != this->userNodes.getnodo(firstNode).vecinos.size() && neighbour == 0; i++) {
+                                        if (this->userNodes.getnodo(firstNode).vecinos[i] == n) {
+                                            neighbour++;
+                                        }
+                                    }
+                                }
+                                //Si no tiene vecinos, imprime opciones normalmente
+                                if (neighbour == 0) {
+                                    if (ImGui::Selectable(this->userNodes.getnodo(n).ip.c_str(), is_selected))
+                                        secondNode = n;
+                                }
 
-                            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-                            if (is_selected)
-                                ImGui::SetItemDefaultFocus();
+                                if (is_selected)
+                                    ImGui::SetItemDefaultFocus();
+                            }
                         }
                     }
                 }
@@ -396,37 +412,39 @@ void Gui::GUIwindow()
             break;
 
         case SEND_MESSAGE:
+            ImGui::TextColored(ImVec4(1, 1, 0, 1), "Send Message");
+            cantNodes = this->userNodes.getcantnodos();
             preview_text = (userNodes.nodos.size() != 0) ? ((firstNode != NO_SELECTION) ? this->userNodes.nodos[firstNode].ip.c_str() : "") : "";
+            //preview_text = (cantNodes != 0) ? ((firstNode != NO_SELECTION) ? (this->userNodes.getnodo(firstNode)).ip.c_str() : "") : "";
             //Primera combobox permite elegir el nodo desde el cual se va a enviar el mensaje
             if (ImGui::BeginCombo("Selected Node", preview_text, 0))
             {
-                for (int n = 0; n != userNodes.nodos.size(); n++)
+                for (int n = 0; n != cantNodes; n++)
                 {
                     const bool is_selected = (firstNode == n);
-                    if (ImGui::Selectable(this->userNodes.nodos[n].ip.c_str(), is_selected)) {
+                    if (ImGui::Selectable(this->userNodes.getnodo(n).ip.c_str(), is_selected)) {
                         firstNode = n;
                         secondNode = NO_SELECTION;
                     }
-                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
                     if (is_selected)
                         ImGui::SetItemDefaultFocus();
                 }
                 ImGui::EndCombo();
             }
-
             preview_text = (userNodes.nodos.size() != 0) ? ((secondNode != NO_SELECTION) ? this->userNodes.nodos[secondNode].ip.c_str() : "") : "";
+            //preview_text = (cantNodes != 0) ? ((secondNode != NO_SELECTION) ? (this->userNodes.getnodo(secondNode)).ip.c_str() : "") : "";
             //Segunda combobox muestra nodos vecinos para enviar mensaje 
             if (ImGui::BeginCombo("Neighbour Node", preview_text, 0))
             {
                 int i = 0;
                 if (firstNode != NO_SELECTION) {
-                    for (int n = 0; n != userNodes.nodos[firstNode].vecinos.size(); n++)
+                    for (int n = 0; n != userNodes.getnodo(firstNode).vecinos.size(); n++)
                     {
-                        i = userNodes.nodos[firstNode].vecinos[n];
+                        i = userNodes.getnodo(firstNode).vecinos[n];
                         const bool is_selected = (secondNode == i);
-                        if (ImGui::Selectable(this->userNodes.nodos[i].ip.c_str(), is_selected))
+                        if (ImGui::Selectable(this->userNodes.getnodo(i).ip.c_str(), is_selected))
                             secondNode = i;
-                        // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+
                         if (is_selected)
                             ImGui::SetItemDefaultFocus();
                     }
@@ -434,20 +452,23 @@ void Gui::GUIwindow()
                 ImGui::EndCombo();
             }
             if (firstNode != NO_SELECTION) {
-                if (this->userNodes.nodos[firstNode].nodofull) {
-                    ImGui::Combo("Node Type", &messageType, fullMessages, IM_ARRAYSIZE(fullMessages));
+                if (this->userNodes.getnodo(firstNode).nodofull) {
+                    ImGui::Combo("Message", &messageType, fullMessages, IM_ARRAYSIZE(fullMessages));
                     switch (messageType - 1) {
                     case 0: //"Block"
-
-                        break;
-                    case 1: //"Transaction"
-
+                        ImGui::TextColored(ImVec4(1, 1, 0, 1), "Message Parameters");
+                        ImGui::InputText("Block", selection1, 50, ImGuiInputTextFlags_CharsDecimal);
                         break;
                     case 2: //"Merkleblock"
-
+                        ImGui::TextColored(ImVec4(1, 1, 0, 1), "Message Parameters");
+                        ImGui::InputText("Block", selection1, 50, ImGuiInputTextFlags_CharsDecimal);
+                        ImGui::InputText("nTx", selection2, 50, ImGuiInputTextFlags_CharsDecimal);
                         break;
+                    case 1: //"Transaction"
                     case 3: //"Get Blocks"
-
+                        ImGui::TextColored(ImVec4(1, 1, 0, 1), "Message Parameters");
+                        ImGui::InputText("Number", selection1, 50, ImGuiInputTextFlags_CharsDecimal);
+                        ImGui::InputText("ID", selection2, 50);
                         break;
                     default:
                         break;
@@ -457,12 +478,12 @@ void Gui::GUIwindow()
                     ImGui::Combo("Node Type", &messageType, spvMessages, IM_ARRAYSIZE(spvMessages));
                     switch (messageType - 1) {
                     case 0: //"Transaction"
-
+                    case 2: //"Get block header"
+                        ImGui::TextColored(ImVec4(1, 1, 0, 1), "Message Parameters");
+                        ImGui::InputText("Number", selection1, 50, ImGuiInputTextFlags_CharsDecimal);
+                        ImGui::InputText("ID", selection2, 50);
                         break;
                     case 1: //"Filter"
-                        break;
-                    case 2: //"Get block header"
-
                         break;
                     default:
                         break;
@@ -475,9 +496,8 @@ void Gui::GUIwindow()
             if (ImGui::Button("Send")) {
                 //En caso de tener completos todos los campos, se realiza la conexion con el mensaje 
                 if (firstNode != NO_SELECTION && secondNode != NO_SELECTION && messageType != 0) {
-                    //std::string send = this->userNodes.clientconect();
-                    firstNode = NO_SELECTION;
-                    secondNode = NO_SELECTION;
+                    //clientconect(int node1, int node2, int option, int cant, std::string id, int bloque, int ntx, int& imgui) {
+                    state = LOG;
                 }
                 
                 //MUESTRA ESTADO DE CONECCION. VOLVER A ESCUCHAR.
@@ -485,6 +505,10 @@ void Gui::GUIwindow()
             ImGui::SameLine();
             if (ImGui::Button("Close")) {
                 doAction = NOTHING;
+                firstNode = NO_SELECTION;
+                secondNode = NO_SELECTION;
+                memset(selection1, 0, sizeof(selection1));
+                memset(selection2, 0, sizeof(selection2));
             }
             break;
         }
@@ -633,6 +657,98 @@ void Gui::GUIwindow()
         }
         ImGui::End();
         break;
+
+        //MAIN_WINDOW
+    case LOG:
+        ImGui::SetNextWindowSize(ImVec2(DISPLAY_SIZE_X, DISPLAY_SIZE_Y), ImGuiCond_Always);
+        ImGui::Begin("Log", &windowActive, ImGuiWindowFlags_MenuBar);
+        //Menu Bar
+        if (ImGui::BeginMenuBar())
+        {
+            if (ImGui::BeginMenu("Menu"))
+            {
+                state = MAIN_WINDOW;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Nodes"))
+            {
+                state = NODE;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("File"))
+            {
+                state = OPEN_FILE;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Blocks"))
+            {
+                state = BLOCKS;
+                doAction = NOTHING;
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
+
+        nlohmann::json send = this->userNodes.clientconect(firstNode, secondNode, messageType - 1, atoi(selection1), std::string(selection2), atoi(selection1), atoi(selection2), checkConnectionState);
+        if (send != nulljson) {
+            isNewConnection = true;
+        }
+        else {
+            isNewConnection = false;
+            checkConnectionState = BADPARAMETERS;
+        }
+        ImGui::TextColored(ImVec4(1, 1, 0, 1), "Log");
+        if (ImGui::Button("Close")) {
+            isNewConnection = CONECTIONOK;
+            //state = MAIN_WINDOW;
+            //firstNode = NO_SELECTION;
+            //secondNode = NO_SELECTION;
+            //memset(selection1, 0, sizeof(selection1));
+            //memset(selection2, 0, sizeof(selection2));
+        }
+        ImGui::Separator();
+
+        //Tiempo
+        time_t date = time(0);
+        struct tm* datetm = gmtime(&date);
+        char* dateGMT = asctime(datetm);
+        std::string str = "";
+
+        ImGui::BeginChild("Scrolling");
+        switch (checkConnectionState) {
+            if (dateGMT != NULL) {
+                str.assign(dateGMT);
+                str.pop_back();
+            }
+            ImGui::Dummy(ImVec2(0.0f, 10.0f));
+        case CONECTIONOK:
+            str += " Established connection between selected nodes.";
+            break;
+        case RESPONSEOK:
+            str += " Response received.";
+            break;
+        case RESPONSEFAIL:
+            str += " Response failed.";
+            break;
+        case CANTCONECT:
+            str += " Can not connect selected nodes.";
+            break;
+        case CANCONECT:
+            str += " Nodes are ready to connect.";
+            break;
+        case BADPARAMETERS:
+            str += " Bad parameters introduced. Can not send message.";
+            break;
+        default:
+            break;
+        }
+        ImGui::EndChild();
+    
+        ImGui::End();
+        break;
     }
 }
 
@@ -645,7 +761,7 @@ void Gui::drawMerkleTree(void) {
 
     //Variables para calculo de dimensiones del buffer segun altura del arbol.
     static int treeHeight = 0;
-    static int sizeY = (int)(BUFFER_SIZE_Y / (treeHeight + 1));;
+    static int sizeY = (int)(BUFFER_SIZE_Y / (treeHeight + 1));
     static int fontSize = 0;
     //Por optimizacion, se recalcula solamente al introducir un nuevo merkle tree.
     if (newMerkleTree) {
@@ -683,6 +799,57 @@ void Gui::drawMerkleTree(void) {
             }
         }
     }
+
+    al_set_target_backbuffer(display);
+    al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_SIZE_X, BUFFER_SIZE_Y, 5, DISPLAY_SIZE_Y - BUFFER_SIZE_Y, BUFFER_SIZE_X, DISPLAY_SIZE_Y, 0);
+}
+
+//Graficacion de conecciones
+void Gui::drawNodesConnections(void) {
+    //Grafica sobre el buffer
+    al_set_target_bitmap(buffer);
+    al_clear_to_color(BLACK);
+
+    //Variables para calculo de dimensiones del buffer segun altura del arbol.
+    static int nodes = 0;
+    static int fontSize = 0;
+    //Por optimizacion, se recalcula solamente al introducir un nuevo merkle tree.
+    if (newMerkleTree) {
+        nodes = userNodes.getcantnodos();
+        fontSize = (int)(BUFFER_SIZE_Y / (nodes * 6));
+        al_destroy_font(font);
+        font = al_load_ttf_font(TREE_FONT, fontSize, 0);
+        if (font == NULL) {
+            fprintf(stderr, "failed to create font!\n");
+            return;
+        }
+        newMerkleTree = false;
+    }
+    //for (int i = 0; i < nodes; i++) {
+    //    printf("%f %f\n", r * Math.cos(2 * Math.PI * i / n), r * Math.sin(2 * Math.PI * i / n));
+    //}
+    //int node = 0;
+    //int i = 1;
+    ////El primer for itera por los niveles del arbol.
+    //for (int height = 0; height != treeHeight; height++, i *= 2) {
+    //    node = merkleTree[treeHeight - height - 1].size() - 1;
+    //    //El segundo for grafica los nodos en cada nivel.
+    //    int sizeX = (int)(BUFFER_SIZE_X / (i + 1));
+    //    for (int j = i; node >= 0; j--, node--) {
+    //        al_draw_text(font, WHITE, sizeX * (j), sizeY * (height), ALLEGRO_ALIGN_CENTRE, merkleTree[treeHeight - height - 1][node].c_str());
+    //        if (height == (treeHeight - 1)) {
+    //            al_draw_text(font, YELLOW, sizeX * (j), sizeY * (height + 1), ALLEGRO_ALIGN_CENTRE, ("T" + std::to_string(j - 1)).c_str());
+    //            al_draw_line(sizeX * (j), sizeY * (height + 1) - fontSize, sizeX * (j), sizeY * (height + 1) - fontSize * 2, WHITE, (float)(8.0 / treeHeight));
+    //        }
+    //        if (i > 1) {
+    //            //En el caso de ser par
+    //            if ((j % 2) == 0) {
+    //                al_draw_line(sizeX * (j), sizeY * (height)-fontSize, sizeX * (j - 1), sizeY * (height)-fontSize, WHITE, (float)(8.0 / treeHeight));
+    //                al_draw_line(sizeX * (j)-(int)(sizeX / 2), sizeY * (height)-fontSize, sizeX * (j)-(int)(sizeX / 2), sizeY * (height)-fontSize * 2, WHITE, (float)(10.0 / treeHeight));
+    //            }
+    //        }
+    //    }
+    //}
 
     al_set_target_backbuffer(display);
     al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_SIZE_X, BUFFER_SIZE_Y, 5, DISPLAY_SIZE_Y - BUFFER_SIZE_Y, BUFFER_SIZE_X, DISPLAY_SIZE_Y, 0);
