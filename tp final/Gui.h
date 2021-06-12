@@ -196,7 +196,7 @@ private:
     int checkConnectionState;
 
     //CONECCIONES
-    bool isNewConnection;
+    bool isNewNode;
 
     //Mensajes de Log
     std::vector<std::string> logMessages;

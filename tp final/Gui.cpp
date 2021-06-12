@@ -2,7 +2,7 @@
 #include <time.h>
 #include <cmath>
 
-#define PI 3.1415926
+#define PI 3.14159265359
 
 using namespace std;
 
@@ -24,7 +24,7 @@ Gui::Gui() {
     newMerkleTree = false;
     selectedPath.clear();
     currentPath.clear();
-    isNewConnection = true;
+    isNewNode = true;
     firstNode = NO_SELECTION;
     secondNode = NO_SELECTION;
 }
@@ -319,6 +319,7 @@ void Gui::GUIwindow()
                 //En el caso de introducirse un puerto par y una IP no vacia, se crea el nodo.
                 if (port % 2 == 0 && ip != "") {
                     this->userNodes.createnode(nodeType == 2, port, ip);
+                    isNewNode = true;
                     //Se limpian los campos introducidos
                     memset(nodeIPtext, 0, sizeof(nodeIPtext));
                     memset(nodePortText, 0, sizeof(nodePortText));
@@ -845,29 +846,49 @@ void Gui::drawNodesConnections(void) {
     static int nodes = 0;
     static int fontSize = 0;
     static float radius = 0;
+    static float angle = 0;
+    static float distance = 0;
     //Por optimizacion, se recalcula solamente al introducir un nuevo merkle tree.
-    if (isNewConnection) {
+    if (isNewNode) {
         nodes = userNodes.getcantnodos();
-        fontSize = (int)(BUFFER_SIZE_Y / (nodes * 6));
+        angle = (2 * PI) / nodes;
+        radius = (BUFFER_SIZE_Y - 10) / 2;
+        distance = hypot(radius - radius* cos(angle), - radius * sin(angle));
+        std::cout << distance << std::endl;
+        if (nodes == 1) {
+            fontSize = (int)(radius / (nodes * 5));
+        }
+        else if (nodes < 4) {
+            fontSize = (int)(distance / (nodes * 4));
+        }
+        else {
+            fontSize = (int)(distance / (nodes));
+        }
+        //if (nodes % 2 == 0) {
+        //    radius = (BUFFER_SIZE_Y - fontSize*2) / 2;
+        //}
         al_destroy_font(font);
         font = al_load_ttf_font(TREE_FONT, fontSize, 0);
         if (font == NULL) {
             fprintf(stderr, "failed to create font!\n");
             return;
         }
-        radius = (BUFFER_SIZE_Y - 30) / 2;
-        isNewConnection = false;
+
+        isNewNode = false;
     }
-    
-    int node = 0;
-    int i = 1;
+
     //el primer for itera por los niveles del arbol
     for (int i = 0; i < nodes; i++) {
-        al_draw_text(font, YELLOW, BUFFER_SIZE_X/2 + radius * cos(2 * PI * i / nodes), BUFFER_SIZE_Y/2 + radius * sin(2 * PI * i / nodes), ALLEGRO_ALIGN_CENTRE, ("N" + std::to_string(i)).c_str());
-        //printf("%f %f\n", radius * cos(2 * PI * i / nodes), radius * sin(2 * PI * i / nodes));
+        if (nodes % 2 == 0) {
+            al_draw_text(font, YELLOW, BUFFER_SIZE_X / 2 + radius * cos(angle * i + PI / 2), (radius - (radius * sin(angle * i + PI / 2) > radius/2 ? 5 : fontSize)) - radius * sin(angle * i + PI / 2), ALLEGRO_ALIGN_CENTRE, ("N" + std::to_string(i)).c_str());
+        }
+        else {
+            al_draw_text(font, YELLOW, BUFFER_SIZE_X / 2 + radius * cos(angle * i + PI / 2), BUFFER_SIZE_Y / 2 - radius * sin(angle * i + PI / 2), ALLEGRO_ALIGN_CENTRE, ("N" + std::to_string(i)).c_str());
+        }
+        //std::cout << i << " " << BUFFER_SIZE_X / 2 + radius * cos(2 * PI * i / nodes) << " " << BUFFER_SIZE_Y / 2 + radius * sin(2 * PI * i / nodes) << std::endl;
     }
     al_set_target_backbuffer(display);
-    al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_SIZE_X, BUFFER_SIZE_Y, 5, DISPLAY_SIZE_Y - BUFFER_SIZE_Y, BUFFER_SIZE_X, DISPLAY_SIZE_Y, 0);
+    al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_SIZE_X, BUFFER_SIZE_Y, 5, DISPLAY_SIZE_Y - BUFFER_SIZE_Y, BUFFER_SIZE_X, BUFFER_SIZE_Y, 0);
 }
 
 //Graficacion de Imagen en Main Window
