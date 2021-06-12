@@ -144,7 +144,7 @@ void cliente::configClient()
 }
 
 
-nlohmann::json cliente::client(std::string request,int puerto,int option,int cant,std::string id, const char* data,int& imgui)
+nlohmann::json cliente::client(std::string request,int puerto,int option,int cant,std::string id, const char* data,int& imgui, bool& tryConnection)
 {
     struct MemoryStruct chunk;
     chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
@@ -244,7 +244,8 @@ nlohmann::json cliente::client(std::string request,int puerto,int option,int can
                 std::cout << "TERMINO" << std::endl;
                 if(!aux.empty())
                     j = nlohmann::json::parse(aux);
-                imgui = 1;
+                imgui = CONNECTIONFINISHED;
+                tryConnection = false;
 		    }
 
             free(chunk.memory);

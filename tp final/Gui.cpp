@@ -94,6 +94,7 @@ void Gui::GUIwindow()
     static int messageType = 0;
     static const char* preview_text = "";
     static int cantNodes = 0;
+    static bool connectionFinished = false;
 
     //Variable de control de ventana de ImGui
     static bool windowActive = true;
@@ -498,6 +499,8 @@ void Gui::GUIwindow()
                 if (firstNode != NO_SELECTION && secondNode != NO_SELECTION && messageType != 0) {
                     //clientconect(int node1, int node2, int option, int cant, std::string id, int bloque, int ntx, int& imgui) {
                     state = LOG;
+                    connectionFinished = false;
+                    logMessages.clear();
                 }
                 
                 //MUESTRA ESTADO DE CONECCION. VOLVER A ESCUCHAR.
@@ -692,13 +695,15 @@ void Gui::GUIwindow()
             ImGui::EndMenuBar();
         }
 
-        nlohmann::json send = this->userNodes.clientconect(firstNode, secondNode, messageType - 1, atoi(selection1), std::string(selection2), atoi(selection1), atoi(selection2), checkConnectionState);
-        if (send != nulljson) {
-            isNewConnection = true;
-        }
-        else {
-            isNewConnection = false;
-            checkConnectionState = BADPARAMETERS;
+        if (!connectionFinished) {
+            nlohmann::json send = this->userNodes.clientconect(firstNode, secondNode, messageType - 1, atoi(selection1), std::string(selection2), atoi(selection1), atoi(selection2), checkConnectionState);
+            if (send != nulljson) {
+                isNewConnection = true;
+            }
+            else {
+                isNewConnection = false;
+                checkConnectionState = BADPARAMETERS;
+            }
         }
         ImGui::TextColored(ImVec4(1, 1, 0, 1), "Log");
         if (ImGui::Button("Close")) {
@@ -722,28 +727,43 @@ void Gui::GUIwindow()
             if (dateGMT != NULL) {
                 str.assign(dateGMT);
                 str.pop_back();
+                std::cout << str << std::endl;
             }
-            ImGui::Dummy(ImVec2(0.0f, 10.0f));
         case CONECTIONOK:
             str += " Established connection between selected nodes.";
+            logMessages.push_back(str);
             break;
         case RESPONSEOK:
             str += " Response received.";
+            logMessages.push_back(str);
             break;
         case RESPONSEFAIL:
             str += " Response failed.";
+            logMessages.push_back(str);
             break;
         case CANTCONECT:
             str += " Can not connect selected nodes.";
+            logMessages.push_back(str);
             break;
         case CANCONECT:
             str += " Nodes are ready to connect.";
+            logMessages.push_back(str);
             break;
         case BADPARAMETERS:
             str += " Bad parameters introduced. Can not send message.";
+            logMessages.push_back(str);
+            break;
+        case CONNECTIONFINISHED:
+            str += " Connection finished.";
+            logMessages.push_back(str);
+            connectionFinished = true;
             break;
         default:
             break;
+        }
+        for (int i = 0; i != logMessages.size(); i++) {
+            ImGui::Dummy(ImVec2(0.0f, 10.0f));
+            ImGui::Text((logMessages[i]).c_str());
         }
         ImGui::EndChild();
     

@@ -72,11 +72,12 @@ nodo nodenet::getnodo(int nodo) {
 }
 //
 nlohmann::json nodenet::clientconect(int node1, int node2, int option,int cant,std::string id,int bloque,int ntx,int& imgui) {
-	std::string iniconfig = "{\status\": false,\"result\": 2 }";
+	std::string iniconfig = "{\"status\": false,\"result\": 2 }";
 	nlohmann::json  aux;
 	aux.parse(iniconfig);
 	blockchain algo2("ejemplo.json");
 	bool isconected = false;
+	static bool isConnectionOk = true;
 	for (std::vector<int>::iterator it = nodos[node1].vecinos.begin(); it != nodos[node1].vecinos.end(); ++it) {
 		if (*it==node2) {//si esta conectado
 			isconected = true;
@@ -109,7 +110,9 @@ nlohmann::json nodenet::clientconect(int node1, int node2, int option,int cant,s
 					}
 					aux = nodos[node2].ip;
 					aux += request[nodos[node1].options[option]];
-					aux=nodos[node1].client.client(aux, nodos[node2].pserver, nodos[node1].options[option], cant, id, data.c_str(),imgui);
+					if (isConnectionOk) {
+						aux = nodos[node1].client.client(aux, nodos[node2].pserver, nodos[node1].options[option], cant, id, data.c_str(), imgui, isConnectionOk);
+					}
 				}
 				catch (std::exception& e)
 				{

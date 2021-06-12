@@ -198,6 +198,9 @@ private:
     //CONECCIONES
     bool isNewConnection;
 
+    //Mensajes de Log
+    std::vector<std::string> logMessages;
+
     nodenet userNodes;
 };
 
