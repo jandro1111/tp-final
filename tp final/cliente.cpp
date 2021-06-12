@@ -215,6 +215,7 @@ nlohmann::json cliente::client(std::string request,int puerto,int option,int can
             if (output != CURLE_OK)
 		    {
 			    std::cerr << "curl_multi_perform() failed: " << curl_multi_strerror(output) << std::endl;
+                imgui = ERRORCLIENT;
 				curl_multi_cleanup(multiHandle);
 				curl_easy_cleanup(curl);
                 curl_global_cleanup();
@@ -254,7 +255,7 @@ nlohmann::json cliente::client(std::string request,int puerto,int option,int can
             return j;
         }
         catch (std::exception& e) {
-            std::cerr << e.what() << std::endl << "HOLAAA no se pudo conectar a ese nodo" << std::endl;
+            std::cerr << e.what() << std::endl << "No se pudo conectar a ese nodo" << std::endl;
             //imgui = RESPONSEFAIL;
         }
     }

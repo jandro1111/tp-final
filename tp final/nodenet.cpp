@@ -86,6 +86,7 @@ nlohmann::json nodenet::clientconect(int node1, int node2, int option,int cant,s
 	}
 	if (canconect(node1,node2)||isconected==false) {//si se puede conectar
 		if (nodos[node1].nodofull == true && nodos[node2].nodofull == false && (option == 2 || option == 3)) {//un nodo full no puede pedirle bloque o getblock a un nodo spv
+			imgui = BADPARAMETERS;
 			return aux;
 		}else{
 			if (option < nodos[node1].options.capacity()) {//si la opcion existe
@@ -116,6 +117,7 @@ nlohmann::json nodenet::clientconect(int node1, int node2, int option,int cant,s
 				}
 				catch (std::exception& e)
 				{
+					imgui = CANTCONECT;
 					std::cerr << e.what() << std::endl<<"no se pudo conectar a ese nodo"<<std::endl;
 				}
 			}

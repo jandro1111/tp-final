@@ -2,6 +2,8 @@
 #include <time.h>
 #include <cmath>
 
+#define PI 3.1415926
+
 using namespace std;
 
 //Constructor. Seteo de variables.
@@ -22,7 +24,7 @@ Gui::Gui() {
     newMerkleTree = false;
     selectedPath.clear();
     currentPath.clear();
-    isNewConnection = false;
+    isNewConnection = true;
     firstNode = NO_SELECTION;
     secondNode = NO_SELECTION;
 }
@@ -321,7 +323,6 @@ void Gui::GUIwindow()
                     memset(nodeIPtext, 0, sizeof(nodeIPtext));
                     memset(nodePortText, 0, sizeof(nodePortText));
                     nodeType = 0;
-                    std::cout << "NODO: " << nodeType << " " << port << " " << ip << std::endl;
                 }
             }
             ImGui::SameLine();
@@ -697,22 +698,17 @@ void Gui::GUIwindow()
 
         if (!connectionFinished) {
             nlohmann::json send = this->userNodes.clientconect(firstNode, secondNode, messageType - 1, atoi(selection1), std::string(selection2), atoi(selection1), atoi(selection2), checkConnectionState);
-            if (send != nulljson) {
-                isNewConnection = true;
-            }
-            else {
-                isNewConnection = false;
+            if (send == nulljson) {
                 checkConnectionState = BADPARAMETERS;
             }
         }
         ImGui::TextColored(ImVec4(1, 1, 0, 1), "Log");
         if (ImGui::Button("Close")) {
-            isNewConnection = CONECTIONOK;
-            //state = MAIN_WINDOW;
-            //firstNode = NO_SELECTION;
-            //secondNode = NO_SELECTION;
-            //memset(selection1, 0, sizeof(selection1));
-            //memset(selection2, 0, sizeof(selection2));
+            state = MAIN_WINDOW;
+            firstNode = NO_SELECTION;
+            secondNode = NO_SELECTION;
+            memset(selection1, 0, sizeof(selection1));
+            memset(selection2, 0, sizeof(selection2));
         }
         ImGui::Separator();
 
@@ -721,42 +717,57 @@ void Gui::GUIwindow()
         struct tm* datetm = gmtime(&date);
         char* dateGMT = asctime(datetm);
         std::string str = "";
+        if (dateGMT != NULL) {
+            str.assign(dateGMT);
+            str.pop_back();
+        }
 
         ImGui::BeginChild("Scrolling");
         switch (checkConnectionState) {
-            if (dateGMT != NULL) {
-                str.assign(dateGMT);
-                str.pop_back();
-                std::cout << str << std::endl;
-            }
+        case CONNECTIONNOTHING:
+            break;
         case CONECTIONOK:
             str += " Established connection between selected nodes.";
             logMessages.push_back(str);
+            checkConnectionState = CONNECTIONNOTHING;
             break;
         case RESPONSEOK:
             str += " Response received.";
             logMessages.push_back(str);
+            checkConnectionState = CONNECTIONNOTHING;
             break;
         case RESPONSEFAIL:
             str += " Response failed.";
             logMessages.push_back(str);
+            checkConnectionState = CONNECTIONNOTHING;
             break;
         case CANTCONECT:
-            str += " Can not connect selected nodes.";
+            str += " Cannot connect selected nodes.";
             logMessages.push_back(str);
+            connectionFinished = true;
+            checkConnectionState = CONNECTIONNOTHING;
             break;
         case CANCONECT:
             str += " Nodes are ready to connect.";
             logMessages.push_back(str);
+            checkConnectionState = CONNECTIONNOTHING;
             break;
         case BADPARAMETERS:
-            str += " Bad parameters introduced. Can not send message.";
+            str += " Bad parameters introduced. Cannot send message.";
             logMessages.push_back(str);
+            checkConnectionState = CONNECTIONNOTHING;
             break;
         case CONNECTIONFINISHED:
             str += " Connection finished.";
             logMessages.push_back(str);
             connectionFinished = true;
+            checkConnectionState = CONNECTIONNOTHING;
+            break;
+        case ERRORCLIENT:
+            str += " Error while connecting client.";
+            logMessages.push_back(str);
+            connectionFinished = true;
+            checkConnectionState = CONNECTIONNOTHING;
             break;
         default:
             break;
@@ -833,8 +844,9 @@ void Gui::drawNodesConnections(void) {
     //Variables para calculo de dimensiones del buffer segun altura del arbol.
     static int nodes = 0;
     static int fontSize = 0;
+    static float radius = 0;
     //Por optimizacion, se recalcula solamente al introducir un nuevo merkle tree.
-    if (newMerkleTree) {
+    if (isNewConnection) {
         nodes = userNodes.getcantnodos();
         fontSize = (int)(BUFFER_SIZE_Y / (nodes * 6));
         al_destroy_font(font);
@@ -843,34 +855,17 @@ void Gui::drawNodesConnections(void) {
             fprintf(stderr, "failed to create font!\n");
             return;
         }
-        newMerkleTree = false;
+        radius = (BUFFER_SIZE_Y - 30) / 2;
+        isNewConnection = false;
     }
-    //for (int i = 0; i < nodes; i++) {
-    //    printf("%f %f\n", r * Math.cos(2 * Math.PI * i / n), r * Math.sin(2 * Math.PI * i / n));
-    //}
-    //int node = 0;
-    //int i = 1;
-    ////El primer for itera por los niveles del arbol.
-    //for (int height = 0; height != treeHeight; height++, i *= 2) {
-    //    node = merkleTree[treeHeight - height - 1].size() - 1;
-    //    //El segundo for grafica los nodos en cada nivel.
-    //    int sizeX = (int)(BUFFER_SIZE_X / (i + 1));
-    //    for (int j = i; node >= 0; j--, node--) {
-    //        al_draw_text(font, WHITE, sizeX * (j), sizeY * (height), ALLEGRO_ALIGN_CENTRE, merkleTree[treeHeight - height - 1][node].c_str());
-    //        if (height == (treeHeight - 1)) {
-    //            al_draw_text(font, YELLOW, sizeX * (j), sizeY * (height + 1), ALLEGRO_ALIGN_CENTRE, ("T" + std::to_string(j - 1)).c_str());
-    //            al_draw_line(sizeX * (j), sizeY * (height + 1) - fontSize, sizeX * (j), sizeY * (height + 1) - fontSize * 2, WHITE, (float)(8.0 / treeHeight));
-    //        }
-    //        if (i > 1) {
-    //            //En el caso de ser par
-    //            if ((j % 2) == 0) {
-    //                al_draw_line(sizeX * (j), sizeY * (height)-fontSize, sizeX * (j - 1), sizeY * (height)-fontSize, WHITE, (float)(8.0 / treeHeight));
-    //                al_draw_line(sizeX * (j)-(int)(sizeX / 2), sizeY * (height)-fontSize, sizeX * (j)-(int)(sizeX / 2), sizeY * (height)-fontSize * 2, WHITE, (float)(10.0 / treeHeight));
-    //            }
-    //        }
-    //    }
-    //}
-
+    
+    int node = 0;
+    int i = 1;
+    //el primer for itera por los niveles del arbol
+    for (int i = 0; i < nodes; i++) {
+        al_draw_text(font, YELLOW, BUFFER_SIZE_X/2 + radius * cos(2 * PI * i / nodes), BUFFER_SIZE_Y/2 + radius * sin(2 * PI * i / nodes), ALLEGRO_ALIGN_CENTRE, ("N" + std::to_string(i)).c_str());
+        //printf("%f %f\n", radius * cos(2 * PI * i / nodes), radius * sin(2 * PI * i / nodes));
+    }
     al_set_target_backbuffer(display);
     al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_SIZE_X, BUFFER_SIZE_Y, 5, DISPLAY_SIZE_Y - BUFFER_SIZE_Y, BUFFER_SIZE_X, DISPLAY_SIZE_Y, 0);
 }
