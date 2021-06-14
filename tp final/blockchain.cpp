@@ -674,7 +674,7 @@ nlohmann::json blockchain::mine(std::string tx, int ntx) {
     int i = 0;
     std::string hash;
     string aux;
-    nlohmann::json bloque;
+    nlohmann::json bloque, tohash;
     aux = str(boost::format("{ \"blockid\": \"\",\"height\" : %1%,\"merkleroot\" : \"\",\"nTx\" : %2%,\"nonce\" : 0,\"previousblockid\" : \"%3%\", ") % cantblocks % ntx % getblockid(getblock(cantblocks - 1)));
     aux += tx;
     aux += "}";
@@ -682,7 +682,7 @@ nlohmann::json blockchain::mine(std::string tx, int ntx) {
     cantblocks++;
     j[cantblocks - 1] = bloque;
     bloque.at("merkleroot") = calculatemerkleroot(cantblocks - 1);
-
+    tohash = makeheader(cantblocks - 1);
     //seteo un nonce random
     do {
         mino = true;
@@ -690,8 +690,8 @@ nlohmann::json blockchain::mine(std::string tx, int ntx) {
         cout << "intento numero: " << i << endl;
         //bloque.at("nonce") = i;
         ++i;
-        bloque.at("nonce") = (rand() % 65536 + 0);
-        hash = hasheo(bloque.dump());
+        tohash.at("nonce") = (rand() % 65536 + 0);
+        hash = hasheo(tohash.dump());
         std::cout << hash << std::endl;
         for (std::string::iterator it = hash.begin(); j < cant0; ++it, ++j) {
             if (*it == '1') {//no cumple con el challange
@@ -701,6 +701,7 @@ nlohmann::json blockchain::mine(std::string tx, int ntx) {
         }
 
     } while (mino == false);
+    bloque.at("nonce") = tohash.at("nonce");
     bloque.at("blockid") = GetHexFromBin(hash);//el bloque id es su hash
     j[cantblocks - 1] = bloque;//lo agrego a la chain
 
