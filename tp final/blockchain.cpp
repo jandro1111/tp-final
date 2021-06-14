@@ -787,3 +787,7 @@ string GetHexFromBin(string sBinary)
     }
     return rest;
 }
+//
+void blockchain::setchallenge(int c) {
+    cant0 = c;
+}

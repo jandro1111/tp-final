@@ -44,6 +44,7 @@ public:
 	void setvin(int block, int tx, std::string blockid, int out, std::string signature, std::string txid);//recive el numero de bloque, de transaccion, el nuevo vin
 	void settx(int block, std::string txid);//recive el numero de bloque y el id de la nueva transaccion, esta empieza con 0 ntxin ntxout
 	void setblock(std::string blockid,  std::string merkleroot, int nonce);//setea un nuevo bloque con 0 transacciones
+	void setchallenge(int c);//setea el challenge
 //otras funciones
 	std::string calculatemerkleroot(int);//recibe el numero del bloque del cual va a querer calcular el merkleroot, devuelve null si es un numero de bloque no valido
 	std::vector<std::vector<std::string>> calculatemerkletree(int);
@@ -59,7 +60,7 @@ public:
 private:
 	nlohmann::json j;// el blockchain
 	int cantblocks;
-	int cant0 = 13;//el challenge 13 es lo maximo que pude cumplir
+	int cant0 = 10;//el challenge 13 es lo maximo que pude cumplir
 };
 std::string generateID(std::string);
 std::string int2hex(int);
