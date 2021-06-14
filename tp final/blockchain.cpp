@@ -1,15 +1,25 @@
 #include "blockchain.h"
 using namespace std;
 //	generate id	//
-unsigned int generateID(const char* str)
+std::string generateID(std::string message)
 {
-	unsigned int ID = 0;
-	int c;
-	while (c = *str++)
-	{
-		ID = c + (ID << 6) + (ID << 16) - ID;
-	}
-	return ID;
+    /*unsigned int ID = 0;
+    int c;
+    while (c = *str++)
+    {
+        ID = c + (ID << 6) + (ID << 16) - ID;
+    }
+    return ID;*/
+    CryptoPP::SHA256 hash;
+    CryptoPP::byte digest[CryptoPP::SHA256::DIGESTSIZE];
+    hash.CalculateDigest(digest, (CryptoPP::byte*)message.c_str(), message.length());
+
+    CryptoPP::HexEncoder encoder;
+    std::string output;
+    encoder.Attach(new CryptoPP::StringSink(output));
+    encoder.Put(digest, sizeof(digest));
+    encoder.MessageEnd();
+    return output;
 }
 //  hexcoded ascii
 template <typename I> std::string n2hexstr(I w, size_t hex_len = sizeof(I) << 1) {
@@ -199,10 +209,10 @@ vector<vector<string>> blockchain::calculatemerkletree(int num)
             vin = getvin(tx, j);
             aux += gettxid(vin);
         }
-        aux = int2hex(generateID(aux.c_str()));
+        aux = generateID(aux);
 
-        aux.resize(8);
-        aux.shrink_to_fit();
+        /*aux.resize(8);
+        aux.shrink_to_fit();*/
         hojas.push_back(aux);
         if (((itx % 2) != 0) && (i == itx - 1)) {//si estoy en la ultima hoja, y esta es impar, la vuelvo a agregar a la lista
             hojas.push_back(aux);
@@ -224,14 +234,17 @@ vector<vector<string>> blockchain::calculatemerkletree(int num)
     else {
         while (temp.size() != 1 && temp2.size() != 1) {
             for (vector<string>::iterator it = temp.begin(); it != temp.end(); it++) {
-                if (((it + 1) == temp.end()) && ((temp.size() % 2) == 1)) { // si es impar y estoy en el ultimo lugar, agrego uno igual al final
-                    temp.push_back(*it);
-                }
                 newID = *it;
                 newID += *(it + 1);
-                newID = int2hex(generateID(newID.c_str()));
+                newID = generateID(newID);
                 temp2.push_back(newID);
                 it++;
+            }
+            if (temp2.size() == 1) {
+                break;
+            }
+            if (((temp2.size() % 2) == 1)) { // si es impar y estoy en el ultimo lugar, agrego uno igual al final
+                temp2.push_back(*(temp2.end() - 1));
             }
             temp.clear();
             fullMerkleTree.push_back(temp2);
@@ -239,14 +252,17 @@ vector<vector<string>> blockchain::calculatemerkletree(int num)
                 break;
             }
             for (vector<string>::iterator it = temp2.begin(); it != temp2.end(); it++) {
-                if (((it + 1) == temp2.end()) && ((temp2.size() % 2) == 1)) { // si es impar y estoy en el ultimo lugar, agrego uno igual al final
-                    temp2.push_back(*it);
-                }
                 newID = *it;
                 newID += *(it + 1);
-                newID = int2hex(generateID(newID.c_str()));
+                newID = generateID(newID);
                 temp.push_back(newID);
                 it++;
+            }
+            if (temp.size() == 1) {
+                break;
+            }
+            if (((temp.size() % 2) == 1)) { // si es impar y estoy en el ultimo lugar, agrego uno igual al final
+                temp.push_back(*(temp.end() - 1));
             }
             temp2.clear();
             fullMerkleTree.push_back(temp);
@@ -255,6 +271,7 @@ vector<vector<string>> blockchain::calculatemerkletree(int num)
 
     return fullMerkleTree;
 }
+
 
 // Calcula el merkle root
 std::string blockchain::calculatemerkleroot(int num) {
@@ -618,4 +635,155 @@ std::string blockchain::sendtx(int amount, std::string publicid) {
     std::string aux = "";
     aux = str(boost::format("{\"nTxin\": 0,\"nTxout\" : 1,\"txid\" : \"algo\",\"vin\" : [] ,\"vout\": [{\"amount\":%1%,\"publicid\":\"%2%\"}]}") % amount %publicid);
     return aux;
+}
+//
+std::string hasheo(std::string m) {
+    std::string bin;
+    std::string a = generateID(m);
+    for (unsigned i = 0; i != a.length(); ++i)
+        bin += hex_char_to_bin(a[i]);
+    return bin;
+}
+//
+const char* hex_char_to_bin(char c)
+{
+    // TODO handle default / error
+    switch (toupper(c))
+    {
+    case '0': return "0000";
+    case '1': return "0001";
+    case '2': return "0010";
+    case '3': return "0011";
+    case '4': return "0100";
+    case '5': return "0101";
+    case '6': return "0110";
+    case '7': return "0111";
+    case '8': return "1000";
+    case '9': return "1001";
+    case 'A': return "1010";
+    case 'B': return "1011";
+    case 'C': return "1100";
+    case 'D': return "1101";
+    case 'E': return "1110";
+    case 'F': return "1111";
+    }
+}
+//
+nlohmann::json blockchain::mine(std::string tx, int ntx) {
+    bool mino = true;
+    int i = 0;
+    std::string hash;
+    string aux;
+    nlohmann::json bloque;
+    aux = str(boost::format("{ \"blockid\": \"\",\"height\" : %1%,\"merkleroot\" : \"\",\"nTx\" : %2%,\"nonce\" : 0,\"previousblockid\" : \"%3%\", ") % cantblocks % ntx % getblockid(getblock(cantblocks - 1)));
+    aux += tx;
+    aux += "}";
+    bloque = nlohmann::json::parse(aux);
+    cantblocks++;
+    j[cantblocks - 1] = bloque;
+    bloque.at("merkleroot") = calculatemerkleroot(cantblocks - 1);
+
+    //seteo un nonce random
+    do {
+        mino = true;
+        int j = 0;
+        cout << "intento numero: " << i << endl;
+        //bloque.at("nonce") = i;
+        ++i;
+        bloque.at("nonce") = (rand() % 65536 + 0);
+        hash = hasheo(bloque.dump());
+        std::cout << hash << std::endl;
+        for (std::string::iterator it = hash.begin(); j < cant0; ++it, ++j) {
+            if (*it == '1') {//no cumple con el challange
+                mino = false;
+                break;
+            }
+        }
+
+    } while (mino == false);
+    bloque.at("blockid") = GetHexFromBin(hash);//el bloque id es su hash
+    j[cantblocks - 1] = bloque;//lo agrego a la chain
+
+    return bloque;
+}
+
+string GetHexFromBin(string sBinary)
+{
+    string rest(""), tmp, chr = "0000";
+    int len = sBinary.length() / 4;
+    chr = chr.substr(0, len);
+    sBinary = sBinary;
+    for (int i = 0; i < sBinary.length(); i += 4)
+    {
+        tmp = sBinary.substr(i, 4);
+        if (!tmp.compare("0000"))
+        {
+            rest = rest + "0";
+        }
+        else if (!tmp.compare("0001"))
+        {
+            rest = rest + "1";
+        }
+        else if (!tmp.compare("0010"))
+        {
+            rest = rest + "2";
+        }
+        else if (!tmp.compare("0011"))
+        {
+            rest = rest + "3";
+        }
+        else if (!tmp.compare("0100"))
+        {
+            rest = rest + "4";
+        }
+        else if (!tmp.compare("0101"))
+        {
+            rest = rest + "5";
+        }
+        else if (!tmp.compare("0110"))
+        {
+            rest = rest + "6";
+        }
+        else if (!tmp.compare("0111"))
+        {
+            rest = rest + "7";
+        }
+        else if (!tmp.compare("1000"))
+        {
+            rest = rest + "8";
+        }
+        else if (!tmp.compare("1001"))
+        {
+            rest = rest + "9";
+        }
+        else if (!tmp.compare("1010"))
+        {
+            rest = rest + "A";
+        }
+        else if (!tmp.compare("1011"))
+        {
+            rest = rest + "B";
+        }
+        else if (!tmp.compare("1100"))
+        {
+            rest = rest + "C";
+        }
+        else if (!tmp.compare("1101"))
+        {
+            rest = rest + "D";
+        }
+        else if (!tmp.compare("1110"))
+        {
+            rest = rest + "E";
+        }
+        else if (!tmp.compare("1111"))
+        {
+            rest = rest + "F";
+        }
+        else
+        {
+            continue;
+        }
+    }
+    return rest;
 }

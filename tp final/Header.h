@@ -16,6 +16,9 @@
 #include<curl/curl.h>
 #include <boost\bind.hpp>
 #include <math.h>
+#include<cryptopp/sha.h>
+#include<cryptopp/hex.h>
+#include<bitset>
 //	DEFINES	//
 const nlohmann::json nulljson ;//supongamos que es un define
 #define SERVERP 80

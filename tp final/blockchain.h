@@ -55,9 +55,14 @@ public:
 	std::string makemerkleblock(int block,int tx);//recibe el numero de bloque del cual va a hacer el merkleblock y el numero de transaccion, si no existe devuelve null
 	std::string makemerklepath(int block, int tx);//recibe el numero de bloque del cual va a hacer el merklepath y el numero de transaccion, si no existe devuelve null
 	std::string sendtx(int amount, std::string publicid);//crea una transaccion para mandarla
+	nlohmann::json mine(std::string tx, int ntx);//recive las transacciones a minar, y la cantidad de estas, devuelve el bloque minado
 private:
 	nlohmann::json j;// el blockchain
 	int cantblocks;
+	int cant0 = 13;//el challenge 13 es lo maximo que pude cumplir
 };
-unsigned int generateID(const char* str);
+std::string generateID(std::string);
 std::string int2hex(int);
+std::string hasheo(std::string);
+const char* hex_char_to_bin(char c);
+std::string GetHexFromBin(std::string sBinary);
