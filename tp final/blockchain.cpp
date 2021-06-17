@@ -675,7 +675,12 @@ nlohmann::json blockchain::mine(std::string tx, int ntx) {
     std::string hash;
     string aux;
     nlohmann::json bloque, tohash;
-    aux = str(boost::format("{ \"blockid\": \"\",\"height\" : %1%,\"merkleroot\" : \"\",\"nTx\" : %2%,\"nonce\" : 0,\"previousblockid\" : \"%3%\", ") % cantblocks % ntx % getblockid(getblock(cantblocks - 1)));
+    if (cantblocks == 0) {
+        aux = str(boost::format("{ \"blockid\": \"\",\"height\" : 0,\"merkleroot\" : \"\",\"nTx\" : %1%,\"nonce\" : 0,\"previousblockid\" : \"0\", ") % ntx );
+    }
+    else {
+        aux = str(boost::format("{ \"blockid\": \"\",\"height\" : %1%,\"merkleroot\" : \"\",\"nTx\" : %2%,\"nonce\" : 0,\"previousblockid\" : \"%3%\", ") % cantblocks % ntx % getblockid(getblock(cantblocks - 1)));
+    }
     aux += tx;
     aux += "}";
     bloque = nlohmann::json::parse(aux);
