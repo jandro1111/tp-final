@@ -19,6 +19,9 @@
 #include<cryptopp/sha.h>
 #include<cryptopp/hex.h>
 #include<bitset>
+#include<cryptopp/eccrypto.h>
+#include<cryptopp/osrng.h>
+#include<cryptopp/oids.h>
 //	DEFINES	//
 const nlohmann::json nulljson ;//supongamos que es un define
 #define SERVERP 80

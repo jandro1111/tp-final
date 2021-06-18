@@ -22,6 +22,19 @@ void nodenet::createnode(bool nodefull,int port,std::string ip) {//que imgui ver
 	nuevo.vecinos.clear();
 	ips.push_back(ip);//agrego la nueva ip a la lista
 	puertos.push_back(port);//agrego el nuevo puerto a la lista
+	//creo la llave publica y privada del nodo ademas de su signature
+	using namespace CryptoPP;
+	CryptoPP::AutoSeededRandomPool prng;
+	nuevo.pvkey.Initialize(prng, ASN1::secp256r1());//inicializo la private key
+	nuevo.pvkey.MakePublicKey(nuevo.publicKey);// creo la public key
+
+	/*ECDSA<ECP, SHA256>::Signer signer(nuevo.pvkey);
+	std::string message = "Do or do not. There is no try.";
+	size_t siglen = signer.MaxSignatureLength();
+	std::string signature(siglen, 0x00);
+	siglen = signer.SignMessage(prng, (const CryptoPP::byte*)&message[0], message.size(), (CryptoPP::byte*)&signature[0]);
+	signature.resize(siglen);
+	*/
 	nodos.push_back(nuevo);//ahora si, meto el nuevo nodo en la net
 	cantnodos++;
 }

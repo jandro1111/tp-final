@@ -67,3 +67,5 @@ std::string int2hex(int);
 std::string hasheo(std::string);
 const char* hex_char_to_bin(char c);
 std::string GetHexFromBin(std::string sBinary);
+using namespace CryptoPP;
+bool txverifier(ECDSA<ECP, SHA256>::PublicKey publicKey,std::string signature,std::string tx);//verifica las transacciones

@@ -12,6 +12,9 @@ struct nodo {
 	int pcliente;
 	std::string ip;
 	std::vector<int> vecinos;//vector con sus nodos vecinos
+	bool minero;
+	ECDSA<ECP, SHA256>::PrivateKey pvkey;
+	ECDSA<ECP, SHA256>::PublicKey publicKey;
 };
 
 class nodenet

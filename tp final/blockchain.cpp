@@ -692,12 +692,12 @@ nlohmann::json blockchain::mine(std::string tx, int ntx) {
     do {
         mino = true;
         int j = 0;
-        cout << "intento numero: " << i << endl;
+        //cout << "intento numero: " << i << endl;
         //bloque.at("nonce") = i;
         ++i;
         tohash.at("nonce") = (rand() % 65536 + 0);
         hash = hasheo(tohash.dump());
-        std::cout << hash << std::endl;
+        //std::cout << hash << std::endl;
         for (std::string::iterator it = hash.begin(); j < cant0; ++it, ++j) {
             if (*it == '1') {//no cumple con el challange
                 mino = false;
@@ -797,3 +797,16 @@ string GetHexFromBin(string sBinary)
 void blockchain::setchallenge(int c) {
     cant0 = c;
 }
+//
+using namespace CryptoPP;
+bool txverifier(ECDSA<ECP, SHA256>::PublicKey publicKey,std::string signature,std::string tx) {
+    ECDSA<ECP, SHA256>::Verifier verifier(publicKey);
+    bool result = verifier.VerifyMessage((const CryptoPP::byte*)&tx[0], tx.size(), (const CryptoPP::byte*)&signature[0], signature.size());
+    if (!result) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+//
