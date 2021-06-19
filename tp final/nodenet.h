@@ -32,7 +32,7 @@ public:
 	std::vector<nodo> nodos;
 private:
 	int cantnodos=0;
-	
+	CryptoPP::AutoSeededRandomPool prng;
 	std::vector<std::string> ips;
 	std::vector<int> puertos;
 	std::string request[6] = { "blockpost/","transactionpost/","merkleblockpost/","filterpost/","getblocks","getblockheader" };

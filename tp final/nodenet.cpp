@@ -24,7 +24,6 @@ void nodenet::createnode(bool nodefull,int port,std::string ip) {//que imgui ver
 	puertos.push_back(port);//agrego el nuevo puerto a la lista
 	//creo la llave publica y privada del nodo ademas de su signature
 	using namespace CryptoPP;
-	CryptoPP::AutoSeededRandomPool prng;
 	nuevo.pvkey.Initialize(prng, ASN1::secp256r1());//inicializo la private key
 	nuevo.pvkey.MakePublicKey(nuevo.publicKey);// creo la public key
 
