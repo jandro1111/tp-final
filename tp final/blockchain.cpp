@@ -669,48 +669,48 @@ const char* hex_char_to_bin(char c)
     }
 }
 //
-nlohmann::json blockchain::mine(std::string tx, int ntx) {
+bool blockchain::mine(std::string tx, int ntx,bool newblock) {
     bool mino = true;
     int i = 0;
     std::string hash;
     string aux;
     nlohmann::json bloque, tohash;
-    if (cantblocks == 0) {
-        aux = str(boost::format("{ \"blockid\": \"\",\"height\" : 0,\"merkleroot\" : \"\",\"nTx\" : %1%,\"nonce\" : 0,\"previousblockid\" : \"0\", ") % ntx );
+    if (newblock == true) {//si tengo que armar un bloque nuevo
+        if (cantblocks == 0) {
+            aux = str(boost::format("{ \"blockid\": \"\",\"height\" : 0,\"merkleroot\" : \"\",\"nTx\" : %1%,\"nonce\" : 0,\"previousblockid\" : \"0\", ") % ntx);
+        }
+        else {
+            aux = str(boost::format("{ \"blockid\": \"\",\"height\" : %1%,\"merkleroot\" : \"\",\"nTx\" : %2%,\"nonce\" : 0,\"previousblockid\" : \"%3%\", ") % cantblocks % ntx % getblockid(getblock(cantblocks - 1)));
+        }
+        aux += tx;
+        aux += "}";
+        bloque = nlohmann::json::parse(aux);
+        cantblocks++;
+        j[cantblocks - 1] = bloque;
+        bloque.at("merkleroot") = calculatemerkleroot(cantblocks - 1);
     }
-    else {
-        aux = str(boost::format("{ \"blockid\": \"\",\"height\" : %1%,\"merkleroot\" : \"\",\"nTx\" : %2%,\"nonce\" : 0,\"previousblockid\" : \"%3%\", ") % cantblocks % ntx % getblockid(getblock(cantblocks - 1)));
-    }
-    aux += tx;
-    aux += "}";
-    bloque = nlohmann::json::parse(aux);
-    cantblocks++;
-    j[cantblocks - 1] = bloque;
-    bloque.at("merkleroot") = calculatemerkleroot(cantblocks - 1);
+    newblock = false;
     tohash = makeheader(cantblocks - 1);
     //seteo un nonce random
-    do {
-        mino = true;
-        int j = 0;
-        //cout << "intento numero: " << i << endl;
-        //bloque.at("nonce") = i;
-        ++i;
-        tohash.at("nonce") = (rand() % 65536 + 0);
-        hash = hasheo(tohash.dump());
-        //std::cout << hash << std::endl;
-        for (std::string::iterator it = hash.begin(); j < cant0; ++it, ++j) {
-            if (*it == '1') {//no cumple con el challange
-                mino = false;
-                break;
-            }
+    //cout << "intento numero: " << i << endl;
+    bloque.at("nonce") = i;
+    tohash.at("nonce") = (rand() % 65536 + 0);
+    hash = hasheo(tohash.dump());
+    //std::cout << hash << std::endl;
+    for (std::string::iterator it = hash.begin(); j < cant0; ++it) {
+        if (*it == '1') {//no cumple con el challange
+            mino = false;
+            break;
         }
-
-    } while (mino == false);
-    bloque.at("nonce") = tohash.at("nonce");
-    bloque.at("blockid") = GetHexFromBin(hash);//el bloque id es su hash
-    j[cantblocks - 1] = bloque;//lo agrego a la chain
-
-    return bloque;
+    }
+    if (mino == true) {
+        newblock = true;
+        bloque.at("nonce") = tohash.at("nonce");
+        bloque.at("blockid") = GetHexFromBin(hash);//el bloque id es su hash
+        j[cantblocks - 1] = bloque;//lo agrego a la chain
+        cout << j[cantblocks - 1] << endl;
+    }
+    return newblock;
 }
 
 string GetHexFromBin(string sBinary)

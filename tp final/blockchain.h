@@ -56,7 +56,7 @@ public:
 	std::string makemerkleblock(int block,int tx);//recibe el numero de bloque del cual va a hacer el merkleblock y el numero de transaccion, si no existe devuelve null
 	std::string makemerklepath(int block, int tx);//recibe el numero de bloque del cual va a hacer el merklepath y el numero de transaccion, si no existe devuelve null
 	std::string sendtx(int amount, std::string publicid);//crea una transaccion para mandarla
-	nlohmann::json mine(std::string tx, int ntx);//recive las transacciones a minar, y la cantidad de estas, devuelve el bloque minado
+	bool mine(std::string tx, int ntx,bool newblock);//recive las transacciones a minar, y la cantidad de estas, devuelve si se pudo minar el bloque
 private:
 	nlohmann::json j;// el blockchain
 	int cantblocks;

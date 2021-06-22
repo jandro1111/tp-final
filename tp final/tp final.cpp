@@ -11,12 +11,18 @@ using namespace std;
 
 int main()
 {
+	bool newbloque = true;
 	srand(time(NULL));
 	blockchain algo("ejemplo.json");
 	nlohmann::json bloque = algo.getblock(0);
 	std::string aux = str(boost::format("\"tx\":[%1%,%2%,%3%,%4%,%5%]") % algo.gettx(bloque, 0) % algo.gettx(bloque, 0) % algo.gettx(bloque, 1) % algo.gettx(bloque, 2) % algo.gettx(bloque, 3));
-	bloque = algo.mine(aux, 5);//tener en cuenta que block id es el hash de minado, osea que a la hora de minar block id es ""
-
+	
+	for (int i = 0; i < 800; ++i) {//sacar el for y meter dentro del sistema de polling
+		newbloque = algo.mine(aux, 5, newbloque);//tener en cuenta que block id es el hash de minado, osea que a la hora de minar block id es ""
+		if (newbloque == true)
+			break;
+	}
+	bloque = algo.getblock(5);
 	cout << endl << endl << endl << bloque << endl;
 	/*
 	blockchain algo2("ejemplo.json");
