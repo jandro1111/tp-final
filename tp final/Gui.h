@@ -82,6 +82,9 @@ public:
     //Devuelve Block deseado dentro del archivo json. 
     int getSelectedBlock(void);
 
+    //Devuelve cantidad de bloques exhibidas en la GUI. 
+    int getGuiCantBlocks(void);
+
     //Setter del Merkle Root.
     void setMerkleRoot(std::string merkleRootCalculated, std::string merkleRootBlock);
 
@@ -108,6 +111,7 @@ public:
 
     //Graficacion de conecciones entre nodos
     void drawNodesConnections();
+
 
     //Display de Allegro
     ALLEGRO_DISPLAY* display;

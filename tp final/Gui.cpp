@@ -903,6 +903,11 @@ std::string Gui::getSelectedFile(void) {
     return selectedPath.string();
 }
 
+//Devuelve cantidad de bloques exhibidas en la GUI. 
+int Gui::getGuiCantBlocks(void) {
+    return (blockInfo.size());
+}
+
 //Setter de informacion primordial del bloque
 void Gui::setBlockInfo(std::string blockID, std::string previousBlockID, int cantTransactions, int blockNumber, int nonce) {
     BlockInfo block = { blockID, previousBlockID, cantTransactions, blockNumber, nonce };

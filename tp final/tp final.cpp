@@ -11,44 +11,44 @@ using namespace std;
 
 int main()
 {
-	bool newbloque = true;
+	bool newblock = true;
 	srand(time(NULL));
-	blockchain algo("ejemplo.json");
-	nlohmann::json bloque = algo.getblock(0);
-	std::string aux = str(boost::format("\"tx\":[%1%,%2%,%3%,%4%,%5%]") % algo.gettx(bloque, 0) % algo.gettx(bloque, 0) % algo.gettx(bloque, 1) % algo.gettx(bloque, 2) % algo.gettx(bloque, 3));
-	
-	for (int i = 0; i < 800; ++i) {//sacar el for y meter dentro del sistema de polling
-		newbloque = algo.mine(aux, 5, newbloque);//tener en cuenta que block id es el hash de minado, osea que a la hora de minar block id es ""
-		if (newbloque == true)
-			break;
-	}
-	bloque = algo.getblock(5);
-	cout << endl << endl << endl << bloque << endl;
-	/*
-	blockchain algo2("ejemplo.json");
+	//blockchain algo("ejemplo.json");
+	//nlohmann::json bloque = algo.getblock(0);
+	//std::string aux = str(boost::format("\"tx\":[%1%,%2%,%3%,%4%,%5%]") % algo.gettx(bloque, 0) % algo.gettx(bloque, 0) % algo.gettx(bloque, 1) % algo.gettx(bloque, 2) % algo.gettx(bloque, 3));
+	//
+	//for (int i = 0; i < 800; ++i) {//sacar el for y meter dentro del sistema de polling
+	//	newbloque = algo.mine(aux, 5, newbloque);//tener en cuenta que block id es el hash de minado, osea que a la hora de minar block id es ""
+	//	if (newbloque == true)
+	//		break;
+	//}
+	//bloque = algo.getblock(5);
+	//cout << endl << endl << endl << bloque << endl;
+	//
+	//blockchain algo2("ejemplo.json");
 
 
 
-	
-	int option = 0;//el tipo de request que voy a hacer
-	cliente algo;
-	std::string request[6] = { "send_block/","send_tx/","send_merkle_block/","send_filter/","get_blocks","get_block_header" };
-	std::string id = "534F219B";
-	std::string publicid = "8745926946298734";
-	int amount = 2;
-	std::string data = "";
-	int cant = 2;
-	int bloque = 0;
-	int tx = 0;
-	std::string ip = "127.0.0.1/";
-	int imgui = 0;
-		int puerto = 80;
-		int puertoc = 80;
-		boost::asio::io_context io_context;//
-		server sv(io_context,puertoc);//
-	int nodeuse;
-	std::cin >> nodeuse;
-	algo.configClient();
+	//
+	//int option = 0;//el tipo de request que voy a hacer
+	//cliente algo;
+	//std::string request[6] = { "send_block/","send_tx/","send_merkle_block/","send_filter/","get_blocks","get_block_header" };
+	//std::string id = "534F219B";
+	//std::string publicid = "8745926946298734";
+	//int amount = 2;
+	//std::string data = "";
+	//int cant = 2;
+	//int bloque = 0;
+	//int tx = 0;
+	//std::string ip = "127.0.0.1/";
+	//int imgui = 0;
+	//	int puerto = 80;
+	//	int puertoc = 80;
+	//	boost::asio::io_context io_context;//
+	//	server sv(io_context,puertoc);//
+	//int nodeuse;
+	//std::cin >> nodeuse;
+	//algo.configClient();
 	//try{
 	//	switch (nodeuse) {
 	//	case 1://cliente
@@ -100,6 +100,16 @@ int main()
 	//	imgui = 1;
 	//	//imgui = RESPONSEFAIL;
 	//}
+
+	/////////////////////////////
+	///Blockchain por default///
+	////////////////////////////
+	blockchain myBlockchain("ejemplo.json");
+	std::string aux = str(boost::format("\"tx\":[]") );
+
+	
+	
+
 	bool running = true;
 	Gui myGui;
 	myGui.initGUI();
@@ -123,41 +133,75 @@ int main()
 	al_start_timer(timer);
 	while (running) {
 
-		// ---------- Obtencion de eventos ---------- //
+		 //---------- Obtencion de eventos ---------- //
 		ALLEGRO_EVENT ev;
 		while (al_get_next_event(queue, &ev)) {
 
-			// Manda el evento a Dear ImGui para que lo procese
+			/* Manda el evento a Dear ImGui para que lo procese
 			ImGui_ImplAllegro5_ProcessEvent(&ev);
 
 
-			//Servidores y clientes
-
+			Servidores y clientes
+*/
 
 			switch (ev.type) {
 			case ALLEGRO_EVENT_TIMER:
 				if (ev.timer.source == timer) {
 
-					// ---------- Inicializacion frame ---------- //
+					 //---------- Inicializacion frame ---------- //
 					ImGui_ImplAllegro5_NewFrame();
 					ImGui::NewFrame();
 					ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
-					// ---------- Widgets y ventanas  ---------- //
+					 //---------- Widgets y ventanas  ---------- //
 					myGui.GUIwindow();
 
 					//De haberse seleccionado algun archivo, se lo accede y se pasa la información de los bloques
-					if (myGui.isNewPath()) {
-						blockchain myBlockchain(myGui.getSelectedFile());
+					//if (myGui.isNewPath()) {
+					//	blockchain myBlockchain(myGui.getSelectedFile());
+					//	nlohmann::json block;
+					//	for (int i = 0; i < myBlockchain.getcantblock(); i++) {
+					//		block = myBlockchain.getblock(i);
+					//		if (block != nulljson) {
+					//			myGui.setBlockInfo(myBlockchain.getblockid(block), myBlockchain.getpreviousblockid(block),
+					//				myBlockchain.getnTx(block), myBlockchain.getheight(block), myBlockchain.getnonce(block));
+					//		}
+					//	}
+					//}
+
+					//MINADO
+					newblock = myBlockchain.mine(aux, 0, newblock);//tener en cuenta que block id es el hash de minado, osea que a la hora de minar block id es ""
+
+
+					//Al minarse un nuevo bloque, debe actualizarse la información contenida en la GUI. 
+					if (newblock) {
+						//Se cambia archivo fuente de blockchain.
+						if (myGui.isNewPath()) {
+							myBlockchain.setnewfile(myGui.getSelectedFile());
+						}
+					
+						std::cout << std::endl;
+						std::cout << std::endl;
+						std::cout << std::endl;
+						std::cout << "NUEVO BLOQUE" << std::endl;
+						std::cout << std::endl;
+						std::cout << std::endl;
+						//Carga de informacion de bloques en Gui.
+						int blockchainBlocks = myBlockchain.getcantblock();
+						int guiBlocks = myGui.getGuiCantBlocks();
 						nlohmann::json block;
-						for (int i = 0; i < myBlockchain.getcantblock(); i++) {
-							block = myBlockchain.getblock(i);
-							if (block != nulljson) {
-								myGui.setBlockInfo(myBlockchain.getblockid(block), myBlockchain.getpreviousblockid(block),
-									myBlockchain.getnTx(block), myBlockchain.getheight(block), myBlockchain.getnonce(block));
+
+						if(blockchainBlocks > guiBlocks) {
+							for (int i = guiBlocks; i < blockchainBlocks; i++) {
+								block = myBlockchain.getblock(i);
+								if (block != nulljson) {
+									myGui.setBlockInfo(myBlockchain.getblockid(block), myBlockchain.getpreviousblockid(block),
+										myBlockchain.getnTx(block), myBlockchain.getheight(block), myBlockchain.getnonce(block));
+								}
 							}
 						}
 					}
+
 					int selectedBlock = myGui.getSelectedBlock();
 					if (selectedBlock != NO_SELECTION) {
 						blockchain myBlockchain(myGui.getSelectedFile());
@@ -166,7 +210,7 @@ int main()
 						myGui.setMerkleTree(myBlockchain.calculatemerkletree(selectedBlock));
 					}
 
-					// ---------- Rendering  ---------- //
+					 //---------- Rendering  ---------- //
 					ImGui::Render();
 
 					al_clear_to_color(BLACK);
@@ -193,9 +237,9 @@ int main()
 				break;
 
 			case ALLEGRO_EVENT_DISPLAY_RESIZE:
-				//ImGui_ImplAllegro5_InvalidateDeviceObjects();
-				//al_acknowledge_resize(myGui.display);
-				//ImGui_ImplAllegro5_CreateDeviceObjects();
+				ImGui_ImplAllegro5_InvalidateDeviceObjects();
+				al_acknowledge_resize(myGui.display);
+				ImGui_ImplAllegro5_CreateDeviceObjects();
 				break;
 			}
 		}
@@ -209,6 +253,6 @@ int main()
 	al_destroy_timer(timer);
 	al_destroy_event_queue(queue);
 	myGui.destroyAllegro();
-	*/
+	
 	return 0;
 }
