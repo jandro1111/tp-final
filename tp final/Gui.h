@@ -26,7 +26,7 @@
 #define     BUFFER_SIZE_X       710
 #define     BUFFER_SIZE_Y       280 
 
-#define     FPS                 10
+#define     FPS                 20
 
 #define     TREE_FONT           "./Fonts/Roboto-Light.ttf"
 #define     EDACOIN             "edacoinLogo.png"
@@ -47,7 +47,7 @@
 
 enum states { MAIN_WINDOW, BLOCKS, OPEN_FILE, NODE, LOG};
 
-enum actions { NOTHING, NOTIFY_NEW_PATH, SEARCH_FILES, CALC_MERKLE, SHOW_TREE, CREATE_NODE, CONNECT_NODES, SEND_MESSAGE};
+enum actions { NOTHING, NOTIFY_NEW_PATH, SEARCH_FILES, CALC_MERKLE, SHOW_TREE, CREATE_NODE, CONNECT_NODES, SEND_MESSAGE, SHOW_CONNECTIONS};
 
 //Estructura que guarda la informacion a mostrar al usuario del bloque deseado
 typedef struct {
@@ -105,6 +105,9 @@ public:
 
     //Devuelve ventana actual de la GUI
     int getGuiState();
+
+    //Indica si se debe dibujar en pantalla grafico de nodos
+    int getDrawConnectionsState();
 
     //Graficacion de Imagen en Main Window
     void drawMainWindow();

@@ -13,102 +13,12 @@ int main()
 {
 	bool newblock = true;
 	srand(time(NULL));
-	//blockchain algo("ejemplo.json");
-	//nlohmann::json bloque = algo.getblock(0);
-	//std::string aux = str(boost::format("\"tx\":[%1%,%2%,%3%,%4%,%5%]") % algo.gettx(bloque, 0) % algo.gettx(bloque, 0) % algo.gettx(bloque, 1) % algo.gettx(bloque, 2) % algo.gettx(bloque, 3));
-	//
-	//for (int i = 0; i < 800; ++i) {//sacar el for y meter dentro del sistema de polling
-	//	newbloque = algo.mine(aux, 5, newbloque);//tener en cuenta que block id es el hash de minado, osea que a la hora de minar block id es ""
-	//	if (newbloque == true)
-	//		break;
-	//}
-	//bloque = algo.getblock(5);
-	//cout << endl << endl << endl << bloque << endl;
-	//
-	//blockchain algo2("ejemplo.json");
-
-
-
-	//
-	//int option = 0;//el tipo de request que voy a hacer
-	//cliente algo;
-	//std::string request[6] = { "send_block/","send_tx/","send_merkle_block/","send_filter/","get_blocks","get_block_header" };
-	//std::string id = "534F219B";
-	//std::string publicid = "8745926946298734";
-	//int amount = 2;
-	//std::string data = "";
-	//int cant = 2;
-	//int bloque = 0;
-	//int tx = 0;
-	//std::string ip = "127.0.0.1/";
-	//int imgui = 0;
-	//	int puerto = 80;
-	//	int puertoc = 80;
-	//	boost::asio::io_context io_context;//
-	//	server sv(io_context,puertoc);//
-	//int nodeuse;
-	//std::cin >> nodeuse;
-	//algo.configClient();
-	//try{
-	//	switch (nodeuse) {
-	//	case 1://cliente
-	//		for (int i = 0; i < 6; ++i) {
-	//			switch (i) {//despues sacar afuera y cambiar i x option
-	//			case 0:
-	//				data = algo2.getblock(bloque).dump();
-	//				break;
-	//			case 1:
-	//				data = algo2.sendtx(amount, publicid);
-	//				break;
-	//			case 2:
-	//				data = algo2.makemerkleblock(bloque, tx);
-	//				break;
-	//			case 3:
-	//				data = "{\"Key\" : \"pubkey1\"}";
-	//				break;
-	//			default:
-	//				break;
-	//			}
-	//			ip += request[i];//cambiar i x option
-	//			while (!imgui) {
-	//				algo.client(ip, puerto, i, cant, id, data.c_str(), imgui);//despues cambiar i por option	
-	//			}
-	//			std::cout << "put any number to continue test" << std::endl;
-	//			cin >> nodeuse;
-	//			ip = "127.0.0.1/";
-	//			data = "";
-	//		}
-	//		break;
-	//case 2://servidor comentar si se esta probando con el servidor de hercules
-	//	try
-	//	{
-	//		sv.start();
-	//		io_context.run();
-	//	}
-	//	catch (std::exception& e)
-	//	{
-	//		std::cerr << e.what() << std::endl;
-	//	}
-	//	break;
-	//default:
-	//	break;
-
-	//}
-	//}
-	//catch (std::exception& e) {
-	//	std::cerr << e.what() << std::endl << "no se pudo conectar a ese nodo" << std::endl;
-	//	imgui = 1;
-	//	//imgui = RESPONSEFAIL;
-	//}
 
 	/////////////////////////////
 	///Blockchain por default///
 	////////////////////////////
 	blockchain myBlockchain("ejemplo.json");
 	std::string aux = str(boost::format("\"tx\":[]") );
-
-	
-	
 
 	bool running = true;
 	Gui myGui;
@@ -133,16 +43,16 @@ int main()
 	al_start_timer(timer);
 	while (running) {
 
+
 		 //---------- Obtencion de eventos ---------- //
 		ALLEGRO_EVENT ev;
 		while (al_get_next_event(queue, &ev)) {
 
-			/* Manda el evento a Dear ImGui para que lo procese
+			//Manda el evento a Dear ImGui para que lo procese
 			ImGui_ImplAllegro5_ProcessEvent(&ev);
 
 
-			Servidores y clientes
-*/
+			//Servidores y clientes
 
 			switch (ev.type) {
 			case ALLEGRO_EVENT_TIMER:
@@ -156,36 +66,12 @@ int main()
 					 //---------- Widgets y ventanas  ---------- //
 					myGui.GUIwindow();
 
-					//De haberse seleccionado algun archivo, se lo accede y se pasa la información de los bloques
-					//if (myGui.isNewPath()) {
-					//	blockchain myBlockchain(myGui.getSelectedFile());
-					//	nlohmann::json block;
-					//	for (int i = 0; i < myBlockchain.getcantblock(); i++) {
-					//		block = myBlockchain.getblock(i);
-					//		if (block != nulljson) {
-					//			myGui.setBlockInfo(myBlockchain.getblockid(block), myBlockchain.getpreviousblockid(block),
-					//				myBlockchain.getnTx(block), myBlockchain.getheight(block), myBlockchain.getnonce(block));
-					//		}
-					//	}
-					//}
-
-					//MINADO
-					newblock = myBlockchain.mine(aux, 0, newblock);//tener en cuenta que block id es el hash de minado, osea que a la hora de minar block id es ""
-
-
 					//Al minarse un nuevo bloque, debe actualizarse la información contenida en la GUI. 
 					if (newblock) {
 						//Se cambia archivo fuente de blockchain.
 						if (myGui.isNewPath()) {
 							myBlockchain.setnewfile(myGui.getSelectedFile());
 						}
-					
-						std::cout << std::endl;
-						std::cout << std::endl;
-						std::cout << std::endl;
-						std::cout << "NUEVO BLOQUE" << std::endl;
-						std::cout << std::endl;
-						std::cout << std::endl;
 						//Carga de informacion de bloques en Gui.
 						int blockchainBlocks = myBlockchain.getcantblock();
 						int guiBlocks = myGui.getGuiCantBlocks();
@@ -202,9 +88,11 @@ int main()
 						}
 					}
 
+					//MINADO
+					newblock = myBlockchain.mine(aux, 0, newblock);//tener en cuenta que block id es el hash de minado, osea que a la hora de minar block id es ""
+
 					int selectedBlock = myGui.getSelectedBlock();
 					if (selectedBlock != NO_SELECTION) {
-						blockchain myBlockchain(myGui.getSelectedFile());
 						nlohmann::json block = myBlockchain.getblock(selectedBlock);
 						myGui.setMerkleRoot(myBlockchain.calculatemerkleroot(selectedBlock), myBlockchain.getmerkleroot(block));
 						myGui.setMerkleTree(myBlockchain.calculatemerkletree(selectedBlock));
@@ -223,6 +111,9 @@ int main()
 
 					if (myGui.isMerkleTree()) {
 						myGui.drawMerkleTree();
+					}
+					if (myGui.getDrawConnectionsState()) {
+						myGui.drawNodesConnections();
 					}
 					if (myGui.getGuiState() == MAIN_WINDOW) {
 						myGui.drawMainWindow();

@@ -27,6 +27,7 @@ Gui::Gui() {
     isNewNode = true;
     firstNode = NO_SELECTION;
     secondNode = NO_SELECTION;
+    blockInfo.clear();
 }
 
 //Inicializacion de Allegro e ImGui.
@@ -189,8 +190,6 @@ void Gui::GUIwindow()
         }
 
         //En caso de haber un archivo seleccionado, se disponen los bloques.
-        if (selectedPath.string() != "") {
-
             ImGui::TextColored(ImVec4(1, 1, 0, 1), "Selected file: "); ImGui::SameLine();
             ImGui::Text(selectedPath.string().c_str());
 
@@ -249,7 +248,6 @@ void Gui::GUIwindow()
             else {
                 ImGui::Text("No blocks in selected file");
             }
-        }
         ImGui::End();
         break;
 
@@ -298,12 +296,16 @@ void Gui::GUIwindow()
         if (ImGui::Button("Send Message")) {
             doAction = SEND_MESSAGE;
         }
+        ImGui::SameLine();
+        if (ImGui::Button("Show Connections")) {
+            doAction = SHOW_CONNECTIONS;
+        }
         ImGui::Separator();
 
         switch (this->doAction) {
 
 
-            //Crear nodo: permite al usuario ingresar IP, puerto (debe ser par) y tipo de nodo.
+        //Crear nodo: permite al usuario ingresar IP, puerto (debe ser par) y tipo de nodo.
         case CREATE_NODE:
             ImGui::TextColored(ImVec4(1, 1, 0, 1), "Create Node");
             ImGui::InputText("Node IP", nodeIPtext, 50);
@@ -435,7 +437,6 @@ void Gui::GUIwindow()
                 ImGui::EndCombo();
             }
             preview_text = (userNodes.nodos.size() != 0) ? ((secondNode != NO_SELECTION) ? this->userNodes.nodos[secondNode].ip.c_str() : "") : "";
-            //preview_text = (cantNodes != 0) ? ((secondNode != NO_SELECTION) ? (this->userNodes.getnodo(secondNode)).ip.c_str() : "") : "";
             //Segunda combobox muestra nodos vecinos para enviar mensaje 
             if (ImGui::BeginCombo("Neighbour Node", preview_text, 0))
             {
@@ -516,6 +517,14 @@ void Gui::GUIwindow()
                 memset(selection2, 0, sizeof(selection2));
             }
             break;
+
+            case SHOW_CONNECTIONS:
+                ImGui::TextColored(ImVec4(1, 1, 0, 1), "Show Connections");
+                ImGui::SameLine();
+                if (ImGui::Button("Close")) {
+                    doAction = NOTHING;
+                }
+                break;
         }
 
         ImGui::End();
@@ -854,7 +863,6 @@ void Gui::drawNodesConnections(void) {
         angle = (2 * PI) / nodes;
         radius = (BUFFER_SIZE_Y - 10) / 2;
         distance = hypot(radius - radius* cos(angle), - radius * sin(angle));
-        std::cout << distance << std::endl;
         if (nodes == 1) {
             fontSize = (int)(radius / (nodes * 5));
         }
@@ -864,9 +872,6 @@ void Gui::drawNodesConnections(void) {
         else {
             fontSize = (int)(distance / (nodes));
         }
-        //if (nodes % 2 == 0) {
-        //    radius = (BUFFER_SIZE_Y - fontSize*2) / 2;
-        //}
         al_destroy_font(font);
         font = al_load_ttf_font(TREE_FONT, fontSize, 0);
         if (font == NULL) {
@@ -885,7 +890,6 @@ void Gui::drawNodesConnections(void) {
         else {
             al_draw_text(font, YELLOW, BUFFER_SIZE_X / 2 + radius * cos(angle * i + PI / 2), BUFFER_SIZE_Y / 2 - radius * sin(angle * i + PI / 2), ALLEGRO_ALIGN_CENTRE, ("N" + std::to_string(i)).c_str());
         }
-        //std::cout << i << " " << BUFFER_SIZE_X / 2 + radius * cos(2 * PI * i / nodes) << " " << BUFFER_SIZE_Y / 2 + radius * sin(2 * PI * i / nodes) << std::endl;
     }
     al_set_target_backbuffer(display);
     al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_SIZE_X, BUFFER_SIZE_Y, 5, DISPLAY_SIZE_Y - BUFFER_SIZE_Y, BUFFER_SIZE_X, BUFFER_SIZE_Y, 0);
@@ -894,6 +898,10 @@ void Gui::drawNodesConnections(void) {
 //Graficacion de Imagen en Main Window
 void Gui::drawMainWindow() {
     al_draw_bitmap(bitmap, 150,50,0);
+}
+
+int Gui::getDrawConnectionsState() {
+    return (doAction == SHOW_CONNECTIONS);
 }
 
 //Devuelve Block deseado dentro del archivo json. 
